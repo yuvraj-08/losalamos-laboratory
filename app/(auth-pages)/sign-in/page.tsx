@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { signInAction } from "@/app/actions";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -47,7 +48,11 @@ export default function SignInForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     setError(null);
-
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("rememberMe", String(values.rememberMe ?? false));
+    signInAction(formData);
     // Simulate API call
     setTimeout(() => {
       console.log(values);

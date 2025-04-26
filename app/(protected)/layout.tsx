@@ -18,5 +18,6 @@ export default async function ProtectedPage({
     return redirect("/sign-in");
   }
 
+  console.log("user", user);
   return <div className="flex-1 w-full flex flex-col gap-12">{children}</div>;
 }

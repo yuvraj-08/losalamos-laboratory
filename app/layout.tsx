@@ -7,6 +7,11 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
+import Footer from "@/common/Footer";
+import Navbar from "@/common/Navbar";
+import Topbar from "@/common/Topbar";
+import { Suspense } from "react";
+import Loader from "./loading";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -31,7 +36,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
-      <body className="bg-background text-foreground">{children}</body>
+      <body className="bg-background text-foreground" cz-shortcut-listen="true">
+        {/* Topbar */}
+        <Topbar />
+        {/* Header */}
+        <Navbar />
+        {/* Children */}
+        <Suspense fallback={<Loader/>}>
+        {children}
+        </Suspense>
+        {/* Footer */}
+        <Footer />
+      </body>
     </html>
   );
 }
