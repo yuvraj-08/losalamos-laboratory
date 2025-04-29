@@ -68,7 +68,7 @@ export default function SignInForm() {
       <div className="hidden bg-gray-100 lg:flex lg:w-1/2 lg:items-center lg:justify-center p-8">
         <div className="relative h-full w-full max-w-md">
           <Image
-            src="/placeholder.svg?height=600&width=600"
+            src="https://images.pexels.com/photos/9574511/pexels-photo-9574511.jpeg?auto=compress&cs=tinysrgb&w=600"
             alt="Laboratory equipment"
             width={600}
             height={600}
@@ -86,7 +86,7 @@ export default function SignInForm() {
             <h2 className="text-3xl font-bold text-teal-700">User Login</h2>
             <p className="text-gray-500 mt-2">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-teal-600 hover:underline">
+              <Link href="/sign-up" className="text-teal-600 hover:underline">
                 Sign up
               </Link>
             </p>

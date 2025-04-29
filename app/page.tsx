@@ -390,7 +390,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="space-y-6 max-w-2xl">
+            <div className="space-y-6">
               <div>
                 <div className="flex justify-between mb-2">
                   <span>Sample Preparation</span>

@@ -26,6 +26,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { signInAction, signUpAction } from "@/app/actions";
 
 const formSchema = z
   .object({
@@ -80,10 +81,19 @@ export default function SignUpForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+
+    signUpAction(formData);
+
     // Simulate API call
     setTimeout(() => {
       console.log(values);
       setIsSubmitting(false);
+      // Uncomment to simulate an error
+      // setError("Invalid email or password. Please try again.")
     }, 1000);
   }
 
@@ -121,7 +131,7 @@ export default function SignUpForm() {
             <h2 className="text-3xl font-bold text-teal-700">User Sign Up</h2>
             <p className="text-gray-500 mt-2">
               Already have an account?{" "}
-              <Link href="/signin" className="text-teal-600 hover:underline">
+              <Link href="/sign-in" className="text-teal-600 hover:underline">
                 Sign in
               </Link>
             </p>
