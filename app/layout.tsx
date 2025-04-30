@@ -2,10 +2,10 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Loader from "./loading";
-import { Toaster } from "sonner";
 import NavbarWrapper from "@/wrappers/NavbarWrapper";
 import FooterWrapper from "@/wrappers/FooterWrapper";
 import TopbarWrapper from "@/wrappers/TopbarWrapper";
+import { Slide, ToastContainer } from "react-toastify";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -37,9 +37,22 @@ export default function RootLayout({
         <NavbarWrapper />
         {/* Children */}
         <Suspense fallback={<Loader />}>{children}</Suspense>
-        <Toaster richColors position="top-right" /> {/* <- Add Toaster here */}
         {/* Footer */}
         <FooterWrapper />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover
+          theme="light"
+          transition={Slide}
+        />
+        {/* <- Add Toaster here */}
       </body>
     </html>
   );

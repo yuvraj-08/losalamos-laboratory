@@ -1,4 +1,1 @@
-export const excludeNavRoutes = [
-    '/sign-in',
-    '/sign-up',
-]
+export const excludeNavRoutes = ["/sign-in", "/sign-up", "/dashboard"];

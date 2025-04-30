@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { signInAction } from "@/app/actions";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -36,6 +38,8 @@ export default function SignInForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,27 +56,32 @@ export default function SignInForm() {
     formData.append("email", values.email);
     formData.append("password", values.password);
     formData.append("rememberMe", String(values.rememberMe ?? false));
-    signInAction(formData);
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
-      setIsSubmitting(false);
-      // Uncomment to simulate an error
-      // setError("Invalid email or password. Please try again.")
-    }, 1000);
+    signInAction(formData)
+      .then((data) => {
+        console.log("Sign in data:", data);
+        toast.success("Signed in successfully");
+        // Redirect to the dashboard or another page
+        router.push("/dashboard");
+      })
+      .catch((err) => {
+        toast.error(`Sign in failed due to : ${err}`);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row w-full">
       {/* Left Column - Image */}
       <div className="hidden bg-gray-100 lg:flex lg:w-1/2 lg:items-center lg:justify-center p-8">
-        <div className="relative h-full w-full max-w-md">
+        <div className="relative max-h-max w-full max-w-md">
           <Image
             src="https://images.pexels.com/photos/9574511/pexels-photo-9574511.jpeg?auto=compress&cs=tinysrgb&w=600"
             alt="Laboratory equipment"
             width={600}
             height={600}
-            className="rounded-lg object-cover shadow-lg"
+            className="rounded-lg object-cover shadow-lg !mt-auto"
             priority
           />
           <div className="absolute inset-0 bg-teal-700/20 rounded-lg"></div>

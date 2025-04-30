@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronDown, LogOut, Menu, User, X } from "lucide-react";
+import {
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  User,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -18,6 +25,7 @@ import {
 import { gsap } from "gsap";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const testCategories = [
   {
@@ -36,7 +44,7 @@ const Navbar = () => {
   const userDropdownRef = useRef(null);
   const [user, setUser] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
-   const supabase =  createClient();
+  const supabase = createClient();
 
   // Get user on initial load
   useEffect(() => {
@@ -73,15 +81,20 @@ const Navbar = () => {
     }
 
     // Fallback to email
-    return user.email.substring(0, 2).toUpperCase();
+    return user?.email.substring(0, 2).toUpperCase();
   };
 
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setShowUserMenu(false);
-    router.push("/sign-in"); // Redirect to sign-in page after logout
+    await supabase.auth.signOut().then(()=>{
+      toast.success("Logged out successfully");
+    }).catch((error) => {
+      toast.error("Error logging out: " + error.message);
+      router.push("/sign-in"); // Redirect to sign-in page after logout
+    }).finally(() => {
+      setShowUserMenu(false);
+    });
   };
 
   // Toggle user dropdown
@@ -228,17 +241,24 @@ const Navbar = () => {
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30">
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 cursor-pointer"
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
                     <Link
                       href="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 cursor-pointer"
                     >
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50"
+                      className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 cursor-pointer"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
@@ -318,18 +338,13 @@ const Navbar = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="about">
-                      <AccordionTrigger>About Us</AccordionTrigger>
-                      <AccordionContent>
-                        <Link
-                          href="/about-us"
-                          onClick={() => setOpenDrawer(false)}
-                          className="block text-gray-600 hover:text-emerald-600 py-2"
-                        >
-                          About Us
-                        </Link>
-                      </AccordionContent>
-                    </AccordionItem>
+                    <Link
+                      href="/about-us"
+                      onClick={() => setOpenDrawer(false)}
+                      className="block text-gray-600 hover:text-emerald-600 py-2"
+                    >
+                      About Us
+                    </Link>
 
                     {/* Conditional rendering for mobile */}
                     {!user ? (
@@ -362,33 +377,30 @@ const Navbar = () => {
                       </>
                     ) : (
                       <>
-                        <AccordionItem value="profile">
-                          <AccordionTrigger>Profile</AccordionTrigger>
-                          <AccordionContent>
-                            <Link
-                              href="/profile"
-                              onClick={() => setOpenDrawer(false)}
-                              className="block text-gray-600 hover:text-emerald-600 py-2"
-                            >
-                              Profile
-                            </Link>
-                          </AccordionContent>
-                        </AccordionItem>
+                        <Link
+                          href="/dashboard"
+                          className="block text-gray-600 hover:text-emerald-600 py-2"
+                        >
+                          Dashboard
+                        </Link>
 
-                        <AccordionItem value="logout">
-                          <AccordionTrigger>Logout</AccordionTrigger>
-                          <AccordionContent>
-                            <button
-                              onClick={async () => {
-                                await handleSignOut();
-                                setOpenDrawer(false);
-                              }}
-                              className="block text-gray-600 hover:text-emerald-600 py-2 w-full text-left"
-                            >
-                              Logout
-                            </button>
-                          </AccordionContent>
-                        </AccordionItem>
+                        <Link
+                          href="/profile"
+                          onClick={() => setOpenDrawer(false)}
+                          className="block text-gray-600 hover:text-emerald-600 py-2"
+                        >
+                          Profile
+                        </Link>
+
+                        <button
+                          onClick={async () => {
+                            await handleSignOut();
+                            setOpenDrawer(false);
+                          }}
+                          className="block text-gray-600 hover:text-emerald-600 py-2 w-full text-left"
+                        >
+                          Logout
+                        </button>
                       </>
                     )}
                   </Accordion>
