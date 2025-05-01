@@ -23,30 +23,32 @@ import { ViewPatientDetails } from "./view-patient-details";
 import { CreatePatientForm } from "./create-patient-form";
 import { EditPatientForm } from "./edit-patient-form";
 import { DeletePatientDialog } from "./delete-patient-dialog";
+import { useRouter } from "next/navigation";
+import { mockPatients } from "@/data/mock-data";
 
 // Mock data
-const mockPatients = [
-  {
-    id: "1",
-    first_name: "John",
-    last_name: "Doe",
-    email: "john.doe@example.com",
-    gender: "male",
-    dob: "1990-01-15",
-    mobile: "+1 (555) 123-4567",
-    address: "123 Elm Street",
-  },
-  {
-    id: "2",
-    first_name: "Jane",
-    last_name: "Smith",
-    email: "jane.smith@example.com",
-    gender: "female",
-    dob: "1985-05-30",
-    mobile: "+1 (555) 987-6543",
-    address: "456 Oak Avenue",
-  },
-];
+// const mockPatients = [
+//   {
+//     id: "1",
+//     first_name: "John",
+//     last_name: "Doe",
+//     email: "john.doe@example.com",
+//     gender: "male",
+//     dob: "1990-01-15",
+//     mobile: "+1 (555) 123-4567",
+//     address: "123 Elm Street",
+//   },
+//   {
+//     id: "2",
+//     first_name: "Jane",
+//     last_name: "Smith",
+//     email: "jane.smith@example.com",
+//     gender: "female",
+//     dob: "1985-05-30",
+//     mobile: "+1 (555) 987-6543",
+//     address: "456 Oak Avenue",
+//   },
+// ];
 
 interface Patient {
   id: string;
@@ -73,6 +75,7 @@ export function PatientsList() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const router = useRouter();
   // Filter based on search term
   const filteredPatients = patients.filter(
     (patient) =>
@@ -96,10 +99,10 @@ export function PatientsList() {
     setIsEditModalOpen(true);
   };
 
-  const handleView = (patient: Patient) => {
-    setViewingPatient(patient);
-    setIsViewModalOpen(true);
-  };
+  // const handleView = (patient: Patient) => {
+  //   setViewingPatient(patient);
+  //   setIsViewModalOpen(true);
+  // };
 
   const handleDelete = (patient: Patient) => {
     setDeletingPatient(patient);
@@ -165,7 +168,7 @@ export function PatientsList() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleView(patient)}
+                        onClick={() => router.push(`/dashboard?tab=patientBookings&patientId=${patient.id}`)}
                       >
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">View</span>

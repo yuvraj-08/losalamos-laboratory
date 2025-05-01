@@ -26,6 +26,10 @@ import { PatientsList } from "@/components/patients/patients-list";
 import { AdminsList } from "@/components/admins/admin-list";
 import { TestList } from "@/components/tests/tests-list";
 import ProfilePage from "@/components/profile";
+import PatientBookingsPage from "@/common/PatientDetailsPage";
+import PatientDetailsPageForAdmin from "@/common/PatientDetailsPageForAdmin";
+import BookingDetailsPageForAdmin from "@/common/BookingDetailsPageForAdmin";
+import PatientBookingDetailsPage from "@/common/BookingDetailsPage";
 
 export default function Dashboard() {
   const tab = useSearchParams().get("tab");
@@ -162,6 +166,10 @@ export default function Dashboard() {
             {activeTab === "admins" && <AdminsList />}
             {activeTab === "tests" && <TestList />}
             {activeTab === "profile" && <ProfilePage />}
+            {activeTab === "booking" && <PatientBookingsPage />}
+            {activeTab === "patientBookings" && <PatientDetailsPageForAdmin />}
+            {activeTab === "adminViewBooking" && <BookingDetailsPageForAdmin />}
+            {activeTab === "viewBooking" && <PatientBookingDetailsPage />}
           </div>
         </main>
       </div>
