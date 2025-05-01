@@ -1,65 +1,86 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-const doctorFormSchema = z.object({
+const adminFormSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  first_name: z.string().min(2, { message: "First name must be at least 2 characters" }),
+  first_name: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters" }),
   last_name: z.string().optional(),
-  gender: z.string().min(4,{
-    message: "Please select a gender",
-  }),
-  degree: z.string().min(2, { message: "Degree is required" }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
-})
+  gender: z.string().min(4, { message: "Please select a gender" }),
+  dob: z.string().min(1, { message: "Date of birth is required" }),
+  mobile: z.string().min(10, { message: "Please enter a valid phone number" }),
+  address: z
+    .string()
+    .min(5, { message: "Address must be at least 5 characters" }),
+});
 
-type DoctorFormValues = z.infer<typeof doctorFormSchema>
+type AdminFormValues = z.infer<typeof adminFormSchema>;
 
-interface EditDoctorFormProps {
-  doctor: DoctorFormValues
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+interface EditAdminFormProps {
+  admin: AdminFormValues;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDoctorFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function EditAdminForm({
+  admin,
+  open,
+  onOpenChange,
+  onSuccess,
+}: EditAdminFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<DoctorFormValues>({
-    resolver: zodResolver(doctorFormSchema),
-    defaultValues: doctor,
-  })
+  const form = useForm<AdminFormValues>({
+    resolver: zodResolver(adminFormSchema),
+    defaultValues: admin,
+  });
 
-  // Update form when doctor changes
+  // Update form when admin changes
   useEffect(() => {
-    if (doctor && open) {
-      form.reset(doctor)
+    if (admin && open) {
+      form.reset(admin);
     }
-  }, [doctor, form, open])
+  }, [admin, form, open]);
 
-  async function onSubmit(data: DoctorFormValues) {
-    setIsSubmitting(true)
+  async function onSubmit(data: AdminFormValues) {
+    setIsSubmitting(true);
 
     try {
       // Simulate API call
-      console.log("Updating doctor:", data)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      console.log("Updating admin:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      onOpenChange(false)
-      if (onSuccess) onSuccess()
+      onOpenChange(false);
+      if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("Error updating doctor:", error)
+      console.error("Error updating admin:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -67,7 +88,7 @@ export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Doctor</DialogTitle>
+          <DialogTitle>Edit Admin</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -107,7 +128,11 @@ export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDo
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="doctor@example.com" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="admin@example.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,10 +141,10 @@ export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDo
 
             <FormField
               control={form.control}
-              name="phone"
+              name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>Mobile</FormLabel>
                   <FormControl>
                     <Input placeholder="+1 (555) 000-0000" {...field} />
                   </FormControl>
@@ -130,12 +155,26 @@ export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDo
 
             <FormField
               control={form.control}
-              name="degree"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Degree</FormLabel>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="MD, MBBS, etc." {...field} />
+                    <Input placeholder="123 Admin St, City" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dob"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -149,24 +188,34 @@ export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDo
                 <FormItem className="space-y-3">
                   <FormLabel>Gender</FormLabel>
                   <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="male" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Male</FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Male
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="female" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Female</FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Female
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="other" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Other</FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Other
+                        </FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -176,16 +225,24 @@ export function EditDoctorForm({ doctor, open, onOpenChange, onSuccess }: EditDo
             />
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-teal-600 hover:bg-teal-700" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Update Doctor"}
+              <Button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-700"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : "Update Admin"}
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

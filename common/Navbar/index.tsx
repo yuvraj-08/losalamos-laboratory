@@ -2,10 +2,7 @@
 
 import {
   ChevronDown,
-  LayoutDashboard,
-  LogOut,
   Menu,
-  User,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -23,9 +20,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { gsap } from "gsap";
-import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { UserDropdown } from "../UserDropdown";
+import { useCurrentUser } from "@/providers/AuthProvider";
+import { getUserInitials } from "@/utils/text";
 
 const testCategories = [
   {
@@ -41,84 +38,8 @@ const testCategories = [
 const Navbar = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const dropdownRef = useRef(null);
-  const userDropdownRef = useRef(null);
-  const [user, setUser] = useState(null);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const supabase = createClient();
 
-  // Get user on initial load
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-    };
-
-    getUser();
-
-    // Set up auth listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase]);
-
-  // Get user initials from email or name
-  const getUserInitials = () => {
-    if (!user) return "";
-
-    if (user.user_metadata?.full_name) {
-      return user.user_metadata.full_name
-        .split(" ")
-        .map((name) => name[0])
-        .join("")
-        .toUpperCase()
-        .substring(0, 2);
-    }
-
-    // Fallback to email
-    return user?.email.substring(0, 2).toUpperCase();
-  };
-
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut().then(()=>{
-      toast.success("Logged out successfully");
-    }).catch((error) => {
-      toast.error("Error logging out: " + error.message);
-      router.push("/sign-in"); // Redirect to sign-in page after logout
-    }).finally(() => {
-      setShowUserMenu(false);
-    });
-  };
-
-  // Toggle user dropdown
-  const toggleUserMenu = () => {
-    setShowUserMenu(!showUserMenu);
-  };
-
-  // Close user dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        userDropdownRef.current &&
-        !userDropdownRef.current.contains(event.target)
-      ) {
-        setShowUserMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
+  const {user} = useCurrentUser();
   // GSAP animations for tests dropdown
   const handleMouseEnter = () => {
     if (dropdownRef.current) {
@@ -232,40 +153,9 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
-              <div className="relative" ref={userDropdownRef}>
-                <button
-                  onClick={toggleUserMenu}
-                  className="flex items-center justify-center bg-emerald-600 text-white rounded-full h-8 w-8 font-medium hover:bg-emerald-700 transition-colors"
-                >
-                  {getUserInitials()}
-                </button>
-
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30">
-                    <Link
-                      href="/dashboard"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 cursor-pointer"
-                    >
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 cursor-pointer"
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleSignOut}
-                      className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 cursor-pointer"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+              
+               <UserDropdown />
+              
             )}
           </nav>
 
@@ -299,7 +189,7 @@ const Navbar = () => {
                 {user && (
                   <div className="flex items-center mb-6 mt-4">
                     <div className="flex items-center justify-center bg-emerald-600 text-white rounded-full h-10 w-10 font-medium">
-                      {getUserInitials()}
+                      {getUserInitials(user.email ?? "")}
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">

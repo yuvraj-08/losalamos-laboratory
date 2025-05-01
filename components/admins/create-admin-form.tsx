@@ -1,65 +1,85 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Plus } from "lucide-react"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Plus } from "lucide-react";
 
-const doctorFormSchema = z.object({
+const adminFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
-  first_name: z.string().min(2, { message: "First name must be at least 2 characters" }),
+  first_name: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters" }),
   last_name: z.string().optional(),
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender",
   }),
-  degree: z.string().min(2, { message: "Degree is required" }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
-})
+  dob: z.string().min(1, { message: "Date of birth is required" }),
+  mobile: z.string().min(10, { message: "Please enter a valid phone number" }),
+  address: z
+    .string()
+    .min(5, { message: "Address must be at least 5 characters" }),
+});
 
-type DoctorFormValues = z.infer<typeof doctorFormSchema>
+type AdminFormValues = z.infer<typeof adminFormSchema>;
 
-interface CreateDoctorFormProps {
-  onSuccess?: () => void
+interface CreateAdminFormProps {
+  onSuccess?: () => void;
 }
 
-export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
-  const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function CreateAdminForm({ onSuccess }: CreateAdminFormProps) {
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<DoctorFormValues>({
-    resolver: zodResolver(doctorFormSchema),
+  const form = useForm<AdminFormValues>({
+    resolver: zodResolver(adminFormSchema),
     defaultValues: {
       email: "",
       first_name: "",
       last_name: "",
       gender: "male",
-      degree: "",
-      phone: "",
+      dob: "",
+      mobile: "",
+      address: "",
     },
-  })
+  });
 
-  async function onSubmit(data: DoctorFormValues) {
-    setIsSubmitting(true)
+  async function onSubmit(data: AdminFormValues) {
+    setIsSubmitting(true);
 
     try {
       // Simulate API call
-      console.log("Creating doctor:", data)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      console.log("Creating admin:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Reset form and close dialog
-      form.reset()
-      setOpen(false)
-      if (onSuccess) onSuccess()
+      form.reset();
+      setOpen(false);
+      if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("Error creating doctor:", error)
+      console.error("Error creating admin:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -67,12 +87,12 @@ export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-teal-600 hover:bg-teal-700">
-          <Plus className="mr-2 h-4 w-4" /> Add Doctor
+          <Plus className="mr-2 h-4 w-4" /> Add Admin
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add New Doctor</DialogTitle>
+          <DialogTitle>Add New Admin</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -112,7 +132,11 @@ export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="doctor@example.com" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="admin@example.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,10 +145,10 @@ export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
 
             <FormField
               control={form.control}
-              name="phone"
+              name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>Mobile</FormLabel>
                   <FormControl>
                     <Input placeholder="+1 (555) 000-0000" {...field} />
                   </FormControl>
@@ -135,12 +159,26 @@ export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
 
             <FormField
               control={form.control}
-              name="degree"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Degree</FormLabel>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="MD, MBBS, etc." {...field} />
+                    <Input placeholder="123 Admin St, City" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dob"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,24 +192,34 @@ export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
                 <FormItem className="space-y-3">
                   <FormLabel>Gender</FormLabel>
                   <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="male" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Male</FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Male
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="female" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Female</FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Female
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="other" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Other</FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Other
+                        </FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -181,16 +229,24 @@ export function CreateDoctorForm({ onSuccess }: CreateDoctorFormProps) {
             />
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-teal-600 hover:bg-teal-700" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Doctor"}
+              <Button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-700"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : "Save Admin"}
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -18,14 +18,18 @@ import {
   LogOut,
   Home,
 } from "lucide-react";
-import { DoctorsList } from "@/components/doctors/doctors-list";
 import { TestCategoriesList } from "@/components/test-categories/test-categories-list";
 import { LabBranchesList } from "@/components/lab-branches/lab-branches-list";
 import gsap from "gsap";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { PatientsList } from "@/components/patients/patients-list";
+import { AdminsList } from "@/components/admins/admin-list";
+import { TestList } from "@/components/tests/tests-list";
+import ProfilePage from "@/components/profile";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("doctors");
+  const tab = useSearchParams().get("tab");
+  const [activeTab, setActiveTab] = useState(tab ?? "patients");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +38,6 @@ export default function Dashboard() {
   };
 
   const router = useRouter();
-
   useEffect(() => {
     if (contentRef.current) {
       gsap.fromTo(
@@ -75,8 +78,8 @@ export default function Dashboard() {
           <SidebarItem
             icon={<User size={20} />}
             text="Patients"
-            active={activeTab === "doctors"}
-            onClick={() => setActiveTab("doctors")}
+            active={activeTab === "patients"}
+            onClick={() => setActiveTab("patients")}
             collapsed={!sidebarOpen}
           />
           <SidebarItem
@@ -146,14 +149,19 @@ export default function Dashboard() {
         <main className="p-6">
           <div ref={contentRef} className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-teal-700 mb-6">
-              {activeTab === "doctors" && "Doctors Management"}
+              {activeTab === "patients" && "Patients Management"}
               {activeTab === "test-categories" && "Test Categories Management"}
               {activeTab === "lab-branches" && "Lab Branches Management"}
+              {activeTab === "admins" && "Admins Management"}
+              {activeTab === "tests" && "Tests Management"}
             </h2>
 
-            {activeTab === "doctors" && <DoctorsList />}
+            {activeTab === "patients" && <PatientsList />}
             {activeTab === "test-categories" && <TestCategoriesList />}
             {activeTab === "lab-branches" && <LabBranchesList />}
+            {activeTab === "admins" && <AdminsList />}
+            {activeTab === "tests" && <TestList />}
+            {activeTab === "profile" && <ProfilePage />}
           </div>
         </main>
       </div>

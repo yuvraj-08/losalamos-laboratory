@@ -1,34 +1,45 @@
-"use client"
+"use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { User, Mail, Phone, Award } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { User, Mail, Phone, Award } from "lucide-react";
 
-interface Doctor {
-  id: string
-  email: string
-  first_name: string
-  last_name?: string
-  gender: string
-  degree: string
-  phone: string
+interface Admin {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name?: string;
+  gender: string;
+  dob: string;
+  mobile: string;
+  address: string;
 }
 
-interface ViewDoctorDetailsProps {
-  doctor: Doctor | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+interface ViewAdminDetailsProps {
+  admin: Admin | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ViewDoctorDetails({ doctor, open, onOpenChange }: ViewDoctorDetailsProps) {
-  if (!doctor) return null
+export function ViewAdminDetails({
+  admin,
+  open,
+  onOpenChange,
+}: ViewAdminDetailsProps) {
+  if (!admin) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Doctor Details</DialogTitle>
+          <DialogTitle>Admin Details</DialogTitle>
         </DialogHeader>
 
         <Card>
@@ -40,9 +51,11 @@ export function ViewDoctorDetails({ doctor, open, onOpenChange }: ViewDoctorDeta
                 </div>
                 <div>
                   <h3 className="text-xl font-medium">
-                    {doctor.first_name} {doctor.last_name}
+                    {admin.first_name} {admin.last_name}
                   </h3>
-                  <p className="text-sm text-muted-foreground capitalize">{doctor.gender}</p>
+                  <p className="text-sm text-muted-foreground capitalize">
+                    {admin.gender}
+                  </p>
                 </div>
               </div>
 
@@ -50,8 +63,10 @@ export function ViewDoctorDetails({ doctor, open, onOpenChange }: ViewDoctorDeta
                 <div className="flex items-center space-x-3">
                   <Award className="h-5 w-5 text-teal-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Degree</p>
-                    <p>{doctor.degree}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Date of Birth
+                    </p>
+                    <p>{admin.dob}</p>
                   </div>
                 </div>
 
@@ -59,15 +74,23 @@ export function ViewDoctorDetails({ doctor, open, onOpenChange }: ViewDoctorDeta
                   <Mail className="h-5 w-5 text-teal-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p>{doctor.email}</p>
+                    <p>{admin.email}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
                   <Phone className="h-5 w-5 text-teal-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Phone</p>
-                    <p>{doctor.phone}</p>
+                    <p className="text-sm text-muted-foreground">Mobile</p>
+                    <p>{admin.mobile}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <Award className="h-5 w-5 text-teal-600" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Address</p>
+                    <p>{admin.address}</p>
                   </div>
                 </div>
               </div>
@@ -80,5 +103,5 @@ export function ViewDoctorDetails({ doctor, open, onOpenChange }: ViewDoctorDeta
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

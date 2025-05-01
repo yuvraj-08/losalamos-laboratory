@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,33 +10,39 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
-interface DeleteDoctorDialogProps {
-  doctorId: string
-  doctorName: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+interface DeleteAdminDialogProps {
+  adminId: string;
+  adminName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function DeleteDoctorDialog({ doctorId, doctorName, open, onOpenChange, onSuccess }: DeleteDoctorDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+export function DeleteAdminDialog({
+  adminId,
+  adminName,
+  open,
+  onOpenChange,
+  onSuccess,
+}: DeleteAdminDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    setIsDeleting(true)
+    setIsDeleting(true);
 
     try {
       // Simulate API call
-      console.log("Deleting doctor:", doctorId)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      console.log("Deleting admin:", adminId);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      onOpenChange(false)
-      if (onSuccess) onSuccess()
+      onOpenChange(false);
+      if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("Error deleting doctor:", error)
+      console.error("Error deleting admin:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
   }
 
@@ -46,8 +52,9 @@ export function DeleteDoctorDialog({ doctorId, doctorName, open, onOpenChange, o
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete <span className="font-medium">{doctorName}</span> from the system. This action
-            cannot be undone.
+            This will permanently delete{" "}
+            <span className="font-medium">{adminName}</span> from the system.
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -62,5 +69,5 @@ export function DeleteDoctorDialog({ doctorId, doctorName, open, onOpenChange, o
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

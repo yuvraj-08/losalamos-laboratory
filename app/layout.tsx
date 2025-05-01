@@ -6,6 +6,7 @@ import NavbarWrapper from "@/wrappers/NavbarWrapper";
 import FooterWrapper from "@/wrappers/FooterWrapper";
 import TopbarWrapper from "@/wrappers/TopbarWrapper";
 import { Slide, ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -33,12 +34,14 @@ export default function RootLayout({
       <body className="bg-background text-foreground" cz-shortcut-listen="true">
         {/* Topbar */}
         <TopbarWrapper />
-        {/* Header */}
-        <NavbarWrapper />
-        {/* Children */}
-        <Suspense fallback={<Loader />}>{children}</Suspense>
-        {/* Footer */}
-        <FooterWrapper />
+        <AuthProvider>
+          {/* Header */}
+          <NavbarWrapper />
+          {/* Children */}
+          <Suspense fallback={<Loader />}>{children}</Suspense>
+          {/* Footer */}
+          <FooterWrapper />
+        </AuthProvider>
         <ToastContainer
           position="bottom-right"
           autoClose={5000}
