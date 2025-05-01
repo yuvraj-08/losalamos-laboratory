@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  ChevronDown,
-  Menu,
-  X,
-} from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -23,6 +19,9 @@ import { gsap } from "gsap";
 import { UserDropdown } from "../UserDropdown";
 import { useCurrentUser } from "@/providers/AuthProvider";
 import { getUserInitials } from "@/utils/text";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const testCategories = [
   {
@@ -37,9 +36,9 @@ const testCategories = [
 
 const Navbar = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const {user} = useCurrentUser();
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const { user } = useCurrentUser();
   // GSAP animations for tests dropdown
   const handleMouseEnter = () => {
     if (dropdownRef.current) {
@@ -68,6 +67,16 @@ const Navbar = () => {
           }
         },
       });
+    }
+  };
+  const supabase = createClient();
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      router.push("/sign-in");
+    } catch (error: any) {
+      toast.error("Error logging out: " + error.message);
     }
   };
 
@@ -153,9 +162,7 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
-              
-               <UserDropdown />
-              
+              <UserDropdown />
             )}
           </nav>
 
