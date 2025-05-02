@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,35 +10,7 @@ import { CreateTestCategoryForm } from "./create-test-category-form"
 import { EditTestCategoryForm } from "./edit-test-category-form"
 import { ViewTestCategoryDetails } from "./view-test-category-details"
 import { DeleteTestCategoryDialog } from "./delete-test-category-dialog"
-
-// Mock data
-const mockCategories = [
-  {
-    id: "1",
-    name: "Blood Tests",
-    description: "Tests that analyze blood components",
-  },
-  {
-    id: "2",
-    name: "Imaging",
-    description: "X-rays, MRIs, CT scans, and other imaging tests",
-  },
-  {
-    id: "3",
-    name: "Pathology",
-    description: "Tests that examine tissues, organs, and bodily fluids",
-  },
-  {
-    id: "4",
-    name: "Genetic Testing",
-    description: "Tests that identify changes in chromosomes, genes, or proteins",
-  },
-  {
-    id: "5",
-    name: "Urinalysis",
-    description: "Tests that examine the physical, chemical, and microscopic properties of urine",
-  },
-]
+import { fetchTestCategories } from "@/utils/supabase/tests&categories"
 
 interface TestCategory {
   id: string
@@ -47,7 +19,7 @@ interface TestCategory {
 }
 
 export function TestCategoriesList() {
-  const [categories, setCategories] = useState<TestCategory[]>(mockCategories)
+  const [categories, setCategories] = useState<TestCategory[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState("10")
@@ -59,6 +31,16 @@ export function TestCategoriesList() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+
+  // Fetch categories from Supabase
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const data = await fetchTestCategories()
+      setCategories(data)
+    }
+
+    fetchCategories()
+  }, [])
 
   // Filter categories based on search term
   const filteredCategories = categories.filter(
@@ -177,7 +159,7 @@ export function TestCategoriesList() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex max-sm:flex-col-reverse max-sm:gap-y-5 items-center justify-between">
         <div className="flex items-center space-x-2">
           <p className="text-sm text-muted-foreground">
             Showing {paginatedCategories.length} of {filteredCategories.length} categories

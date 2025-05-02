@@ -1,34 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Plus } from "lucide-react"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Plus } from "lucide-react";
+import { insertLabBranch } from "@/utils/supabase/lab-branches";
 
 const labBranchFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  address: z.string().min(5, { message: "Address must be at least 5 characters" }),
+  address: z
+    .string()
+    .min(5, { message: "Address must be at least 5 characters" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   opening_hours: z.string().optional(),
   manager_name: z.string().optional(),
-})
+});
 
-type LabBranchFormValues = z.infer<typeof labBranchFormSchema>
+export type LabBranchFormValues = z.infer<typeof labBranchFormSchema>;
 
 interface CreateLabBranchFormProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
 export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
-  const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LabBranchFormValues>({
     resolver: zodResolver(labBranchFormSchema),
@@ -40,26 +57,19 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
       opening_hours: "",
       manager_name: "",
     },
-  })
+  });
 
-  async function onSubmit(data: LabBranchFormValues) {
-    setIsSubmitting(true)
-
-    try {
-      // Simulate API call
-      console.log("Creating lab branch:", data)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Reset form and close dialog
-      form.reset()
-      setOpen(false)
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error("Error creating lab branch:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  const onSubmit = async (data: LabBranchFormValues) => {
+    setIsSubmitting(true);
+    insertLabBranch(data)
+      .then(() => {
+        form.reset();
+        setOpen(false);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -95,7 +105,11 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
                 <FormItem>
                   <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Full address" className="resize-none min-h-[80px]" {...field} />
+                    <Textarea
+                      placeholder="Full address"
+                      className="resize-none min-h-[80px]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,7 +138,11 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="branch@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="branch@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,7 +157,10 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
                 <FormItem>
                   <FormLabel>Opening Hours</FormLabel>
                   <FormControl>
-                    <Input placeholder="Mon-Fri: 9am-5pm, Sat: 10am-2pm" {...field} />
+                    <Input
+                      placeholder="Mon-Fri: 9am-5pm, Sat: 10am-2pm"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -161,10 +182,18 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
             />
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-teal-600 hover:bg-teal-700" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-700"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Save Branch"}
               </Button>
             </DialogFooter>
@@ -172,5 +201,5 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { signInAction, signUpAction } from "@/app/actions";
+import { handleSignUpAction } from "@/utils/supabase/auth";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -65,6 +67,7 @@ const formSchema = z
 
 export default function SignUpForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,20 +84,14 @@ export default function SignUpForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-
-    const formData = new FormData();
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-
-    signUpAction(formData);
-
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
-      setIsSubmitting(false);
-      // Uncomment to simulate an error
-      // setError("Invalid email or password. Please try again.")
-    }, 1000);
+    handleSignUpAction(values)
+      .then(() => {
+        form.reset();
+        router.push("/sign-in");
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (

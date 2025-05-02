@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Eye, Pencil, Trash2, Search } from "lucide-react";
 import { ViewPatientDetails } from "./view-patient-details";
-import { CreatePatientForm } from "./create-patient-form";
+// import { CreatePatientForm } from "./create-patient-form";
 import { EditPatientForm } from "./edit-patient-form";
 import { DeletePatientDialog } from "./delete-patient-dialog";
 import { useRouter } from "next/navigation";
@@ -115,9 +115,9 @@ export function PatientsList() {
     }
   };
 
-  const handleCreateSuccess = () => {
-    console.log("Patient created successfully");
-  };
+  // const handleCreateSuccess = () => {
+  //   console.log("Patient created successfully");
+  // };
 
   const handleEditSuccess = () => {
     console.log("Patient updated successfully");
@@ -137,19 +137,19 @@ export function PatientsList() {
             />
           </div>
         </div>
-        <CreatePatientForm onSuccess={handleCreateSuccess} />
+        {/* <CreatePatientForm onSuccess={handleCreateSuccess} /> */}
       </div>
 
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
+              <TableHead className="min-w-[130px]">Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Mobile</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>DOB</TableHead>
-              <TableHead className="w-[100px] text-right">Actions</TableHead>
+              <TableHead className="min-w-[130px]">Mobile</TableHead>
+              <TableHead className="min-w-[130px]">Gender</TableHead>
+              <TableHead className="min-w-[130px]">DOB</TableHead>
+              <TableHead className="w-[100px] text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -206,7 +206,7 @@ export function PatientsList() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex max-sm:flex-col-reverse max-sm:gap-y-5 items-center justify-between">
         <div className="flex items-center space-x-2">
           <p className="text-sm text-muted-foreground">
             Showing {paginatedPatients.length} of {filteredPatients.length}{" "}

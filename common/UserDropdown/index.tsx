@@ -15,7 +15,7 @@ export function UserDropdown() {
   const router = useRouter();
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const {user} = useCurrentUser();
+  const {user, appUser} = useCurrentUser();
 
   const handleSignOut = async () => {
     try {
@@ -52,7 +52,7 @@ export function UserDropdown() {
         onClick={() => setShowUserMenu(!showUserMenu)}
         className="flex items-center justify-center bg-emerald-600 text-white rounded-full h-8 w-8 font-medium hover:bg-emerald-700 transition-colors"
       >
-        {getUserInitials(user.email || "")}
+        {getUserInitials(appUser?.first_name || "")}
       </button>
 
       {showUserMenu && (

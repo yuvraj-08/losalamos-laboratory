@@ -1,6 +1,6 @@
 // Define all the types we'll use across the application
 
-export type Patient = {
+export type User = {
   id: string;
   first_name: string;
   last_name: string;
@@ -10,6 +10,13 @@ export type Patient = {
   mobile: string;
   address: string;
 };
+
+export interface IExtendedUser extends User {
+  role: string;
+  auth_id: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export type Lab = {
   id: string;
@@ -48,3 +55,15 @@ export type TestResult = {
   performed_at: string | null;
   status: "pending" | "completed" | "in-progress";
 };
+
+export interface IFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  gender: "male" | "female" | "other";
+  dob: Date;
+  mobile: string;
+  address: string;
+}

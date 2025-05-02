@@ -30,12 +30,23 @@ import PatientBookingsPage from "@/common/PatientDetailsPage";
 import PatientDetailsPageForAdmin from "@/common/PatientDetailsPageForAdmin";
 import BookingDetailsPageForAdmin from "@/common/BookingDetailsPageForAdmin";
 import PatientBookingDetailsPage from "@/common/BookingDetailsPage";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
-  const tab = useSearchParams().get("tab");
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(tab ?? "patients");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const isMobile = useIsMobile(); // Adjust this value as needed for your mobile breakpoint
+  // Effect to update activeTab when search params change
+  useEffect(() => {
+    const currentTab = searchParams.get("tab");
+    if (currentTab) {
+      setActiveTab(currentTab);
+    }
+  }, [searchParams]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -56,8 +67,8 @@ export default function Dashboard() {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <div
-        className={`bg-teal-800 text-white fixed h-full transition-all duration-300 ease-in-out ${
-          sidebarOpen ? "w-64" : "w-20"
+        className={`bg-teal-800 text-white z-30 fixed h-full transition-all duration-300 ease-in-out ${
+          sidebarOpen ? "max-sm:w-full w-64" : "w-20"
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-teal-700">
@@ -83,42 +94,57 @@ export default function Dashboard() {
             icon={<User size={20} />}
             text="Patients"
             active={activeTab === "patients"}
-            onClick={() => setActiveTab("patients")}
+            onClick={() => {
+              setActiveTab("patients");
+              isMobile && setSidebarOpen(false);
+            }}
             collapsed={!sidebarOpen}
           />
           <SidebarItem
             icon={<FlaskConical size={20} />}
             text="Tests"
             active={activeTab === "tests"}
-            onClick={() => setActiveTab("tests")}
+            onClick={() => {
+              setActiveTab("tests");
+              isMobile && setSidebarOpen(false);
+            }}
             collapsed={!sidebarOpen}
           />
           <SidebarItem
             icon={<FolderKanban size={20} />}
             text="Test Categories"
             active={activeTab === "test-categories"}
-            onClick={() => setActiveTab("test-categories")}
+            onClick={() => {
+              setActiveTab("test-categories");
+              isMobile && setSidebarOpen(false);
+            }}
             collapsed={!sidebarOpen}
           />
           <SidebarItem
             icon={<MapPin size={20} />}
             text="Lab Branches"
             active={activeTab === "lab-branches"}
-            onClick={() => setActiveTab("lab-branches")}
+            onClick={() => {
+              setActiveTab("lab-branches");
+              isMobile && setSidebarOpen(false);
+            }}
             collapsed={!sidebarOpen}
           />
-          <SidebarItem
+          {/* <SidebarItem
             icon={<ShieldCheck size={20} />}
             text="Admins"
             active={activeTab === "admins"}
             onClick={() => setActiveTab("admins")}
             collapsed={!sidebarOpen}
-          />
+          /> */}
           <SidebarItem
             icon={<UserCircle size={20} />}
             text="Profile"
             active={activeTab === "profile"}
-            onClick={() => setActiveTab("profile")}
+            onClick={() => {
+              setActiveTab("profile");
+              isMobile && setSidebarOpen(false);
+            }}
             collapsed={!sidebarOpen}
           />
           <SidebarItem
@@ -132,7 +158,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div
-        className={`flex-1 transition-all duration-300 ease-in-out ${
+        className={`flex-1 transition-all duration-300 ease-in-out max-w-full overflow-x-auto ${
           sidebarOpen ? "ml-64" : "ml-20"
         }`}
       >
@@ -150,20 +176,20 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <main className="p-6">
-          <div ref={contentRef} className="bg-white rounded-lg shadow-sm p-6">
+        <main className="sm:p-6">
+          <div ref={contentRef} className="bg-white rounded-lg shadow-sm sm:px-6 py-6">
             <h2 className="text-xl font-semibold text-teal-700 mb-6">
               {activeTab === "patients" && "Patients Management"}
               {activeTab === "test-categories" && "Test Categories Management"}
               {activeTab === "lab-branches" && "Lab Branches Management"}
-              {activeTab === "admins" && "Admins Management"}
+              {/* {activeTab === "admins" && "Admins Management"} */}
               {activeTab === "tests" && "Tests Management"}
             </h2>
 
             {activeTab === "patients" && <PatientsList />}
             {activeTab === "test-categories" && <TestCategoriesList />}
             {activeTab === "lab-branches" && <LabBranchesList />}
-            {activeTab === "admins" && <AdminsList />}
+            {/* {activeTab === "admins" && <AdminsList />} */}
             {activeTab === "tests" && <TestList />}
             {activeTab === "profile" && <ProfilePage />}
             {activeTab === "booking" && <PatientBookingsPage />}

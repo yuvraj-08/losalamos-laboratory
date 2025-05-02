@@ -1,30 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Plus } from "lucide-react"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Plus } from "lucide-react";
+import { insertTestCategory } from "@/utils/supabase/tests&categories";
 
 const testCategoryFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   description: z.string().optional(),
-})
+});
 
-type TestCategoryFormValues = z.infer<typeof testCategoryFormSchema>
+type TestCategoryFormValues = z.infer<typeof testCategoryFormSchema>;
 
 interface CreateTestCategoryFormProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
-export function CreateTestCategoryForm({ onSuccess }: CreateTestCategoryFormProps) {
-  const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function CreateTestCategoryForm({
+  onSuccess,
+}: CreateTestCategoryFormProps) {
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<TestCategoryFormValues>({
     resolver: zodResolver(testCategoryFormSchema),
@@ -32,26 +49,20 @@ export function CreateTestCategoryForm({ onSuccess }: CreateTestCategoryFormProp
       name: "",
       description: "",
     },
-  })
+  });
 
-  async function onSubmit(data: TestCategoryFormValues) {
-    setIsSubmitting(true)
-
-    try {
-      // Simulate API call
-      console.log("Creating test category:", data)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Reset form and close dialog
-      form.reset()
-      setOpen(false)
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error("Error creating test category:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  const onSubmit = (data: TestCategoryFormValues) => {
+    setIsSubmitting(true);
+    const { name, description } = data;
+    insertTestCategory(name, description || "")
+      .then(() => {
+        form.reset();
+        setOpen(false);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -99,10 +110,18 @@ export function CreateTestCategoryForm({ onSuccess }: CreateTestCategoryFormProp
             />
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-teal-600 hover:bg-teal-700" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-700"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Save Category"}
               </Button>
             </DialogFooter>
@@ -110,5 +129,5 @@ export function CreateTestCategoryForm({ onSuccess }: CreateTestCategoryFormProp
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -38,7 +38,7 @@ const Navbar = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
-  const { user } = useCurrentUser();
+  const { user, loading, appUser } = useCurrentUser();
   // GSAP animations for tests dropdown
   const handleMouseEnter = () => {
     if (dropdownRef.current) {
@@ -86,6 +86,9 @@ const Navbar = () => {
     }
   }, []);
 
+  if (loading) {
+    return null; // or a loading spinner
+  }
   return (
     <>
       <header className="bg-emerald-50 py-4 px-4 md:px-8">
@@ -196,11 +199,13 @@ const Navbar = () => {
                 {user && (
                   <div className="flex items-center mb-6 mt-4">
                     <div className="flex items-center justify-center bg-emerald-600 text-white rounded-full h-10 w-10 font-medium">
-                      {getUserInitials(user.email ?? "")}
+                      {getUserInitials(appUser?.first_name ?? user.email ?? "")}
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">
-                        {user.user_metadata?.full_name || user.email}
+                        {appUser?.first_name && appUser?.last_name
+                          ? `${appUser.first_name} ${appUser.last_name}`
+                          : user.email}
                       </p>
                     </div>
                   </div>

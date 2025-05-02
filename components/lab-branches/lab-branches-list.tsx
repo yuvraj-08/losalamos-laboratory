@@ -1,15 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Pencil, Trash2, Search } from "lucide-react"
-import { CreateLabBranchForm } from "./create-lab-branch-form"
-import { EditLabBranchForm } from "./edit-lab-branch-form"
-import { ViewLabBranchDetails } from "./view-lab-branch-details"
-import { DeleteLabBranchDialog } from "./delete-lab-branch-dialog"
+import { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, Pencil, Trash2, Search } from "lucide-react";
+import { CreateLabBranchForm } from "./create-lab-branch-form";
+import { EditLabBranchForm } from "./edit-lab-branch-form";
+import { ViewLabBranchDetails } from "./view-lab-branch-details";
+import { DeleteLabBranchDialog } from "./delete-lab-branch-dialog";
+import { fetchLabBranches } from "@/utils/supabase/lab-branches";
 
 // Mock data
 const mockBranches = [
@@ -58,31 +72,41 @@ const mockBranches = [
     opening_hours: "Mon-Fri: 9am-6pm, Sat: 10am-4pm",
     manager_name: "Michael Jones",
   },
-]
+];
 
 interface LabBranch {
-  id: string
-  name: string
-  address: string
-  phone: string
-  email: string
-  opening_hours?: string
-  manager_name?: string
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  opening_hours?: string;
+  manager_name?: string;
 }
 
 export function LabBranchesList() {
-  const [branches, setBranches] = useState<LabBranch[]>(mockBranches)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState("10")
+  const [branches, setBranches] = useState<LabBranch[]>(mockBranches);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState("10");
 
   // Modal states
-  const [editingBranch, setEditingBranch] = useState<LabBranch | null>(null)
-  const [viewingBranch, setViewingBranch] = useState<LabBranch | null>(null)
-  const [deletingBranch, setDeletingBranch] = useState<LabBranch | null>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [editingBranch, setEditingBranch] = useState<LabBranch | null>(null);
+  const [viewingBranch, setViewingBranch] = useState<LabBranch | null>(null);
+  const [deletingBranch, setDeletingBranch] = useState<LabBranch | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Fetch categories from Supabase
+  useEffect(() => {
+    const fetchBranches = async () => {
+      const data = await fetchLabBranches();
+      setBranches(data);
+    };
+
+    fetchBranches();
+  }, []);
 
   // Filter branches based on search term
   const filteredBranches = branches.filter(
@@ -91,47 +115,50 @@ export function LabBranchesList() {
       branch.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       branch.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       branch.phone.includes(searchTerm) ||
-      (branch.manager_name && branch.manager_name.toLowerCase().includes(searchTerm.toLowerCase())),
-  )
+      (branch.manager_name &&
+        branch.manager_name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   // Pagination
-  const totalPages = Math.ceil(filteredBranches.length / Number.parseInt(itemsPerPage))
+  const totalPages = Math.ceil(
+    filteredBranches.length / Number.parseInt(itemsPerPage)
+  );
   const paginatedBranches = filteredBranches.slice(
     (currentPage - 1) * Number.parseInt(itemsPerPage),
-    currentPage * Number.parseInt(itemsPerPage),
-  )
+    currentPage * Number.parseInt(itemsPerPage)
+  );
 
   // Handlers
   const handleEdit = (branch: LabBranch) => {
-    setEditingBranch(branch)
-    setIsEditModalOpen(true)
-  }
+    setEditingBranch(branch);
+    setIsEditModalOpen(true);
+  };
 
   const handleView = (branch: LabBranch) => {
-    setViewingBranch(branch)
-    setIsViewModalOpen(true)
-  }
+    setViewingBranch(branch);
+    setIsViewModalOpen(true);
+  };
 
   const handleDelete = (branch: LabBranch) => {
-    setDeletingBranch(branch)
-    setIsDeleteModalOpen(true)
-  }
+    setDeletingBranch(branch);
+    setIsDeleteModalOpen(true);
+  };
 
   const handleDeleteSuccess = () => {
     if (deletingBranch) {
-      setBranches(branches.filter((b) => b.id !== deletingBranch.id))
+      setBranches(branches.filter((b) => b.id !== deletingBranch.id));
     }
-  }
+  };
 
   const handleCreateSuccess = () => {
     // In a real app, you would fetch the updated list
-    console.log("Branch created successfully")
-  }
+    console.log("Branch created successfully");
+  };
 
   const handleEditSuccess = () => {
     // In a real app, you would fetch the updated list
-    console.log("Branch updated successfully")
-  }
+    console.log("Branch updated successfully");
+  };
 
   return (
     <div className="space-y-4">
@@ -167,20 +194,32 @@ export function LabBranchesList() {
                 <TableRow key={branch.id}>
                   <TableCell className="font-medium">{branch.name}</TableCell>
                   <TableCell>
-                    {branch.address.length > 30 ? `${branch.address.substring(0, 30)}...` : branch.address}
+                    {branch.address.length > 30
+                      ? `${branch.address.substring(0, 30)}...`
+                      : branch.address}
                   </TableCell>
                   <TableCell>
                     <div>{branch.phone}</div>
-                    <div className="text-sm text-muted-foreground">{branch.email}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {branch.email}
+                    </div>
                   </TableCell>
                   <TableCell>{branch.manager_name || "—"}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleView(branch)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleView(branch)}
+                      >
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">View</span>
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(branch)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(branch)}
+                      >
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                       </Button>
@@ -209,16 +248,17 @@ export function LabBranchesList() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex max-sm:flex-col-reverse max-sm:gap-y-5 items-center justify-between">
         <div className="flex items-center space-x-2">
           <p className="text-sm text-muted-foreground">
-            Showing {paginatedBranches.length} of {filteredBranches.length} branches
+            Showing {paginatedBranches.length} of {filteredBranches.length}{" "}
+            branches
           </p>
           <Select
             value={itemsPerPage}
             onValueChange={(value) => {
-              setItemsPerPage(value)
-              setCurrentPage(1)
+              setItemsPerPage(value);
+              setCurrentPage(1);
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
@@ -246,7 +286,9 @@ export function LabBranchesList() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages || totalPages === 0}
           >
             Next
@@ -264,7 +306,11 @@ export function LabBranchesList() {
         />
       )}
 
-      <ViewLabBranchDetails branch={viewingBranch} open={isViewModalOpen} onOpenChange={setIsViewModalOpen} />
+      <ViewLabBranchDetails
+        branch={viewingBranch}
+        open={isViewModalOpen}
+        onOpenChange={setIsViewModalOpen}
+      />
 
       {deletingBranch && (
         <DeleteLabBranchDialog
@@ -276,5 +322,5 @@ export function LabBranchesList() {
         />
       )}
     </div>
-  )
+  );
 }

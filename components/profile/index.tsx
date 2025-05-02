@@ -1,23 +1,49 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { gsap } from "gsap"
-import { CalendarIcon, Save, User } from "lucide-react"
-import { format } from "date-fns"
+import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { gsap } from "gsap";
+import { CalendarIcon, Save, User } from "lucide-react";
+import { format } from "date-fns";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "react-toastify"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "react-toastify";
+import { useCurrentUser } from "@/providers/AuthProvider";
 
 const formSchema = z.object({
   first_name: z.string().min(2, {
@@ -41,50 +67,59 @@ const formSchema = z.object({
   address: z.string().min(5, {
     message: "Address must be at least 5 characters.",
   }),
-})
+});
 
 export default function ProfilePage() {
-  const [isLoading, setIsLoading] = useState(false)
-
+  const [isLoading, setIsLoading] = useState(false);
+  const { appUser } = useCurrentUser();
+  console.log(appUser);
   // Mock user data - in a real app, this would come from an API
   const defaultValues = {
-    first_name: "Alice",
-    last_name: "Manager",
-    email: "alice.manager@example.com",
-    gender: "female",
-    dob: new Date("1985-04-12"),
-    mobile: "+1 (555) 111-2233",
-    address: "123 Main St, Los Alamos, NM 87544",
-  }
+    first_name: appUser?.first_name || "",
+    last_name: appUser?.last_name || "",
+    email: appUser?.email || "",
+    gender: appUser?.gender || "",
+    dob: (appUser?.dob && new Date(appUser.dob)) || new Date(),
+    mobile: appUser?.mobile || "",
+    address: appUser?.address || "",
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
-  })
+  });
 
   // GSAP animations
   useEffect(() => {
-    const timeline = gsap.timeline()
+    const timeline = gsap.timeline();
 
-    timeline.fromTo(".profile-card", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
+    timeline.fromTo(
+      ".profile-card",
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.5 }
+    );
 
-    timeline.fromTo(".form-field", { opacity: 0, y: 10 }, { opacity: 1, y: 0, stagger: 0.1, duration: 0.3 })
+    timeline.fromTo(
+      ".form-field",
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, stagger: 0.1, duration: 0.3 }
+    );
 
     return () => {
-      timeline.kill()
-    }
-  }, [])
+      timeline.kill();
+    };
+  }, []);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      console.log(values)
-      setIsLoading(false)
+      console.log(values);
+      setIsLoading(false);
 
       // Success animation for the button
-      const saveBtn = document.querySelector(".save-button")
+      const saveBtn = document.querySelector(".save-button");
       if (saveBtn) {
         gsap.to(saveBtn, {
           backgroundColor: "rgb(22, 163, 74)",
@@ -94,13 +129,13 @@ export default function ProfilePage() {
               backgroundColor: "",
               duration: 0.5,
               delay: 0.5,
-            })
+            });
           },
-        })
+        });
       }
 
-      toast.success("Your profile information has been updated successfully.")
-    }, 1500)
+      toast.success("Your profile information has been updated successfully.");
+    }, 1500);
   }
 
   return (
@@ -117,7 +152,9 @@ export default function ProfilePage() {
               <User size={32} />
             </div>
             <div>
-              <CardTitle className="text-xl text-gray-800">Personal Information</CardTitle>
+              <CardTitle className="text-xl text-gray-800">
+                Personal Information
+              </CardTitle>
               <CardDescription className="text-gray-500">
                 Update your personal details and contact information
               </CardDescription>
@@ -164,9 +201,14 @@ export default function ProfilePage() {
                   <FormItem className="form-field">
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your email address" {...field} />
+                      <Input
+                        placeholder="Enter your email address"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormDescription>This email will be used for all communications.</FormDescription>
+                    <FormDescription>
+                      This email will be used for all communications.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -179,7 +221,10 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem className="form-field">
                       <FormLabel>Gender</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select gender" />
@@ -189,7 +234,9 @@ export default function ProfilePage() {
                           <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
-                          <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                          <SelectItem value="prefer-not-to-say">
+                            Prefer not to say
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -210,10 +257,14 @@ export default function ProfilePage() {
                               variant={"outline"}
                               className={cn(
                                 "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground",
+                                !field.value && "text-muted-foreground"
                               )}
                             >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
@@ -223,7 +274,9 @@ export default function ProfilePage() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
                             initialFocus
                           />
                         </PopoverContent>
@@ -241,7 +294,10 @@ export default function ProfilePage() {
                   <FormItem className="form-field">
                     <FormLabel>Mobile Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your mobile number" {...field} />
+                      <Input
+                        placeholder="Enter your mobile number"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -255,7 +311,11 @@ export default function ProfilePage() {
                   <FormItem className="form-field">
                     <FormLabel>Address</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enter your address" className="resize-none" {...field} />
+                      <Textarea
+                        placeholder="Enter your address"
+                        className="resize-none"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -305,5 +365,5 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

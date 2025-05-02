@@ -44,7 +44,7 @@ export function BookingList({
   }, [bookings]);
 
   const baseUrl = isAdmin
-    ? `/dashboard?patientId=${patientId}&tab=adminViewBooking&bookingId`
+    ? `/dashboard?tab=adminViewBooking&patientId=${patientId}&bookingId`
     : `/dashboard?tab=viewBooking&bookingId`;
 
   return (

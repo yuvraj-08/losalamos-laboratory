@@ -216,7 +216,7 @@ export function TestList() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex max-sm:flex-col-reverse max-sm:gap-y-5 items-center justify-between">
         <div className="flex items-center space-x-2">
           <p className="text-sm text-muted-foreground">
             Showing {paginatedTests.length} of {filteredTests.length} tests
