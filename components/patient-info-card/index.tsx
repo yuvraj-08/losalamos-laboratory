@@ -1,9 +1,9 @@
-import type { Patient } from "@/types";
+import type { User } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Mail, MapPin, Phone, User } from "lucide-react";
+import { CalendarDays, Mail, MapPin, Phone, UserCheck } from "lucide-react";
 
 type PatientInfoCardProps = {
-  patient: Patient;
+  patient: User;
 };
 
 export function PatientInfoCard({ patient }: PatientInfoCardProps) {
@@ -11,7 +11,7 @@ export function PatientInfoCard({ patient }: PatientInfoCardProps) {
     <Card className="border-gray-200 shadow-sm">
       <CardHeader className="bg-gradient-to-r from-teal-600/10 to-teal-600/5 border-b pb-6">
         <CardTitle className="text-xl text-gray-800 flex items-center gap-2">
-          <User className="h-5 w-5 text-teal-600" />
+          <UserCheck className="h-5 w-5 text-teal-600" />
           Patient Information
         </CardTitle>
       </CardHeader>

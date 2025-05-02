@@ -1,4 +1,4 @@
-import type { Booking, Lab, Patient, Test, TestResult } from "../types";
+import type { Booking, Lab, User, Test, TestResult } from "../types";
 
 // Mock data for development and testing
 
@@ -55,7 +55,7 @@ export const mockTests: Test[] = [
   },
 ];
 
-export const mockPatients: Patient[] = [
+export const mockPatients: User[] = [
   {
     id: "user-001",
     first_name: "Alice",
@@ -244,7 +244,7 @@ export const getTestResultsForBooking = (bookingId: string): TestResult[] => {
 };
 
 // Helper function to get a patient by ID
-export const getPatientById = (patientId: string): Patient | undefined => {
+export const getPatientById = (patientId: string): User | undefined => {
   return mockPatients.find((patient) => patient.id === patientId);
 };
 
