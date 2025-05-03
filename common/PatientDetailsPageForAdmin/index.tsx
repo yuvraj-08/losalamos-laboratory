@@ -108,7 +108,6 @@ export default function PatientDetailsPageForAdmin() {
         <div className="bookings-list">
           <BookingList
             bookings={bookings}
-            isAdmin={true}
             patientId={patientId}
           />
         </div>

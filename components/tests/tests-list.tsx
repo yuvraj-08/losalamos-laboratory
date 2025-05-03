@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -19,66 +19,78 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Eye, Pencil, Trash2, Search } from "lucide-react";
-import { CreateTestForm } from "./create-test-form";
+import { CreateTestForm, TestFormValues } from "./create-test-form";
 import { EditTestForm } from "./edit-test-form";
 import { ViewTestDetails } from "./view-test-details";
 import { DeleteTestDialog } from "./delete-test-dialog";
+import { fetchTests } from "@/utils/supabase/tests&categories";
 
 // Mock data
-const mockTests = [
-  {
-    id: "1",
-    name: "Blood Test",
-    category: "Blood Tests",
-    description: "Tests that analyze blood components",
-    duration: "1 hour",
-    cost: 100,
-    ideal_range: "Normal",
-  },
-  {
-    id: "2",
-    name: "MRI",
-    category: "Imaging",
-    description: "X-rays, MRIs, CT scans, and other imaging tests",
-    duration: "2 hours",
-    cost: 500,
-    ideal_range: "Normal",
-  },
-  {
-    id: "3",
-    name: "Urine Test",
-    category: "Urinalysis",
-    description:
-      "Tests that examine the physical, chemical, and microscopic properties of urine",
-    duration: "30 minutes",
-    cost: 50,
-    ideal_range: "Normal",
-  },
-];
+// const mockTests = [
+//   {
+//     id: "1",
+//     name: "Blood Test",
+//     category: "Blood Tests",
+//     description: "Tests that analyze blood components",
+//     duration: "1 hour",
+//     cost: 100,
+//     ideal_range: "Normal",
+//   },
+//   {
+//     id: "2",
+//     name: "MRI",
+//     category: "Imaging",
+//     description: "X-rays, MRIs, CT scans, and other imaging tests",
+//     duration: "2 hours",
+//     cost: 500,
+//     ideal_range: "Normal",
+//   },
+//   {
+//     id: "3",
+//     name: "Urine Test",
+//     category: "Urinalysis",
+//     description:
+//       "Tests that examine the physical, chemical, and microscopic properties of urine",
+//     duration: "30 minutes",
+//     cost: 50,
+//     ideal_range: "Normal",
+//   },
+// ];
 
-interface Test {
+export interface TestWithCategory extends TestFormValues {
   id: string;
-  name: string;
-  category: string;
-  description?: string;
-  duration?: string;
-  cost?: number;
-  ideal_range?: string;
+  created_at?: string;
+  updated_at?: string;
+  test_category?: {
+    id?: string;
+    name?: string;
+    description?: string;
+  };
 }
 
 export function TestList() {
-  const [tests, setTests] = useState<Test[]>(mockTests);
+  const [tests, setTests] = useState<TestWithCategory[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
 
   // Modal states
-  const [editingTest, setEditingTest] = useState<Test | null>(null);
-  const [viewingTest, setViewingTest] = useState<Test | null>(null);
-  const [deletingTest, setDeletingTest] = useState<Test | null>(null);
+  const [editingTest, setEditingTest] = useState<TestWithCategory | null>(null);
+  const [viewingTest, setViewingTest] = useState<TestWithCategory | null>(null);
+  const [deletingTest, setDeletingTest] = useState<TestWithCategory | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Fetch categories from Supabase
+  useEffect(() => {
+    const fetchTestsData = async () => {
+      const data = await fetchTests();
+      setTests(data);
+    };
+
+    fetchTestsData();
+  }, []);
 
   // Filter tests based on search term
   const filteredTests = tests.filter(
@@ -98,17 +110,17 @@ export function TestList() {
   );
 
   // Handlers
-  const handleEdit = (test: Test) => {
+  const handleEdit = (test: TestWithCategory) => {
     setEditingTest(test);
     setIsEditModalOpen(true);
   };
 
-  const handleView = (test: Test) => {
+  const handleView = (test: TestWithCategory) => {
     setViewingTest(test);
     setIsViewModalOpen(true);
   };
 
-  const handleDelete = (test: Test) => {
+  const handleDelete = (test: TestWithCategory) => {
     setDeletingTest(test);
     setIsDeleteModalOpen(true);
   };
@@ -164,7 +176,7 @@ export function TestList() {
               paginatedTests.map((test) => (
                 <TableRow key={test.id}>
                   <TableCell className="font-medium">{test.name}</TableCell>
-                  <TableCell>{test.category}</TableCell>
+                  <TableCell>{test.test_category?.name}</TableCell>
                   <TableCell>
                     {test.description && test.description.length > 100
                       ? `${test.description.substring(0, 100)}...`

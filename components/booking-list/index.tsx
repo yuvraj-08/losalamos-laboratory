@@ -17,18 +17,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "../status-badge";
+import { useCurrentUser } from "@/providers/AuthProvider";
 
 type BookingListProps = {
   bookings: Booking[];
-  isAdmin?: boolean;
   patientId?: string;
 };
 
 export function BookingList({
   bookings,
-  isAdmin = false,
   patientId,
 }: BookingListProps) {
+
+  const {appUser} = useCurrentUser();
+  const isAdmin = appUser?.role === "admin";
   useEffect(() => {
     const timeline = gsap.timeline();
 
@@ -42,6 +44,7 @@ export function BookingList({
       timeline.kill();
     };
   }, [bookings]);
+
 
   const baseUrl = isAdmin
     ? `/dashboard?tab=adminViewBooking&patientId=${patientId}&bookingId`

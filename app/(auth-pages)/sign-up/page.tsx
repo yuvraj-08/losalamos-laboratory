@@ -26,7 +26,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { signInAction, signUpAction } from "@/app/actions";
 import { handleSignUpAction } from "@/utils/supabase/auth";
 import { useRouter } from "next/navigation";
 
@@ -50,11 +49,11 @@ const formSchema = z
     gender: z.enum(["male", "female", "other"], {
       required_error: "Please select a gender.",
     }),
-    dob: z.date({
+    date_of_birth: z.date({
       required_error: "Please select a date of birth.",
     }),
-    mobile: z.string().min(10, {
-      message: "Mobile number must be at least 10 digits.",
+    phone: z.string().min(10, {
+      message: "Phone number must be at least 10 digits.",
     }),
     address: z.string().min(10, {
       message: "Address must be at least 10 characters.",
@@ -77,7 +76,7 @@ export default function SignUpForm() {
       email: "",
       password: "",
       confirmPassword: "",
-      mobile: "",
+      phone: "",
       address: "",
     },
   });
@@ -260,7 +259,7 @@ export default function SignUpForm() {
 
                 <FormField
                   control={form.control}
-                  name="dob"
+                  name="date_of_birth"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Date of Birth</FormLabel>
@@ -303,12 +302,12 @@ export default function SignUpForm() {
 
               <FormField
                 control={form.control}
-                name="mobile"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mobile</FormLabel>
+                    <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="Mobile" {...field} />
+                      <Input placeholder="Phone" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

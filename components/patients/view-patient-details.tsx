@@ -17,8 +17,8 @@ interface Patient {
   first_name: string;
   last_name?: string;
   gender: string;
-  dob: string;
-  mobile: string;
+  date_of_birth: string;
+  phone: string;
   address: string;
 }
 
@@ -66,7 +66,7 @@ export function ViewPatientDetails({
                     <p className="text-sm text-muted-foreground">
                       Date of Birth
                     </p>
-                    <p>{patient.dob}</p>
+                    <p>{patient.date_of_birth}</p>
                   </div>
                 </div>
 
@@ -81,8 +81,8 @@ export function ViewPatientDetails({
                 <div className="flex items-center space-x-3">
                   <Phone className="h-5 w-5 text-teal-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Mobile</p>
-                    <p>{patient.mobile}</p>
+                    <p className="text-sm text-muted-foreground">Phone</p>
+                    <p>{patient.phone}</p>
                   </div>
                 </div>
 

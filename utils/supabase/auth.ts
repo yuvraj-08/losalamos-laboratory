@@ -6,14 +6,13 @@ export const handleSignUpAction = async (data: IFormValues) => {
   const {
     password,
     confirmPassword,
-    dob,
-    mobile,
+    date_of_birth,
+    phone,
     firstName,
     lastName,
     ...rest
   } = data;
   const email = data.email;
-  const origin = window.location.origin;
   const supabase = await createClient();
 
   if (!email || !password) {
@@ -25,7 +24,7 @@ export const handleSignUpAction = async (data: IFormValues) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : "losalamos-laboratory.vercel.app"}/auth/callback`,
     },
   });
 
@@ -40,10 +39,10 @@ export const handleSignUpAction = async (data: IFormValues) => {
     email: data.email,
     first_name: firstName,
     last_name: lastName || null,
-    date_of_birth: new Date(dob).toISOString().split("T")[0], // Converts to 'YYYY-MM-DD'
+    date_of_birth: new Date(date_of_birth).toISOString().split("T")[0], // Converts to 'YYYY-MM-DD'
     gender: data.gender,
     address: data.address,
-    phone: mobile,
+    phone: data.phone,
     role: "user",
     auth_id: userDataSupa.user?.id || null,
   };
@@ -57,11 +56,8 @@ export const handleSignUpAction = async (data: IFormValues) => {
     toast.error(userError?.message || "Failed to save user data");
     return;
   }
-
-  console.log(user, "userData");
   toast.success(
     "Please check your email for a verification link."
   );
 
-  console.log(data, "formDatatatatata");
 };

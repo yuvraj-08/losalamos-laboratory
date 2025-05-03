@@ -23,23 +23,24 @@ import {
   getTestResultsForBooking,
   mockLabs,
 } from "@/data/mock-data";
+import { useCurrentUser } from "@/providers/AuthProvider";
 
 // // In a real app, you would get the current user ID from authentication
 // const CURRENT_USER_ID = "user-001"
 
 export default function PatientBookingDetailsPage() {
   const router = useRouter();
+  const {appUser} = useCurrentUser();
   const [isLoading, setIsLoading] = useState(true);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
 
-  const patientId = useSearchParams().get("patientId") || "";
   const bookingId = useSearchParams().get("bookingId") || "";
-  const patient = getPatientById(patientId);
+  const patient = appUser;
   const booking = getBookingWithDetails(bookingId);
   const lab = booking ? mockLabs.find((l) => l.id === booking.lab) : undefined;
 
   // Verify this booking belongs to the current user
-  const isUserBooking = booking?.user_id === patientId;
+  const isUserBooking = booking?.user_id === appUser?.id;
 
   useEffect(() => {
     // Fetch test results
@@ -94,7 +95,7 @@ export default function PatientBookingDetailsPage() {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => router.push("/patient/bookings")}
+            onClick={() => router.push("/dashboard?tab=bookings")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to My Bookings

@@ -10,18 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
-
-interface Test {
-  id: string;
-  name: string;
-  description?: string;
-  duration?: string; // Assuming duration is a string, adjust if necessary
-  cost?: number;
-  ideal_range?: string;
-}
+import { TestWithCategory } from "./tests-list";
 
 interface ViewTestDetailsProps {
-  test: Test | null;
+  test: TestWithCategory | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -70,7 +62,7 @@ export function ViewTestDetails({
                 {test.cost && (
                   <div>
                     <p className="text-sm text-muted-foreground">Cost</p>
-                    <p className="mt-1">${test.cost.toFixed(2)}</p>
+                    <p className="mt-1">${test.cost}</p>
                   </div>
                 )}
 

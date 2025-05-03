@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -24,7 +24,8 @@ import { ViewPatientDetails } from "./view-patient-details";
 import { EditPatientForm } from "./edit-patient-form";
 import { DeletePatientDialog } from "./delete-patient-dialog";
 import { useRouter } from "next/navigation";
-import { mockPatients } from "@/data/mock-data";
+import { fetchUsers } from "@/utils/supabase/users";
+import { IExtendedUser } from "@/types";
 
 // Mock data
 // const mockPatients = [
@@ -35,7 +36,7 @@ import { mockPatients } from "@/data/mock-data";
 //     email: "john.doe@example.com",
 //     gender: "male",
 //     dob: "1990-01-15",
-//     mobile: "+1 (555) 123-4567",
+//     phone: "+1 (555) 123-4567",
 //     address: "123 Elm Street",
 //   },
 //   {
@@ -45,7 +46,7 @@ import { mockPatients } from "@/data/mock-data";
 //     email: "jane.smith@example.com",
 //     gender: "female",
 //     dob: "1985-05-30",
-//     mobile: "+1 (555) 987-6543",
+//     phone: "+1 (555) 987-6543",
 //     address: "456 Oak Avenue",
 //   },
 // ];
@@ -53,36 +54,46 @@ import { mockPatients } from "@/data/mock-data";
 interface Patient {
   id: string;
   first_name: string;
-  last_name: string;
+  last_name?: string;
   email: string;
   gender: string;
-  dob: string;
-  mobile: string;
+  date_of_birth: string;
+  phone: string;
   address: string;
 }
 
 export function PatientsList() {
-  const [patients, setPatients] = useState<Patient[]>(mockPatients);
+  const [patients, setPatients] = useState<IExtendedUser[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
 
   // Modal states
-  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [viewingPatient, setViewingPatient] = useState<Patient | null>(null);
-  const [deletingPatient, setDeletingPatient] = useState<Patient | null>(null);
+  const [editingPatient, setEditingPatient] = useState<IExtendedUser | null>(null);
+  const [viewingPatient, setViewingPatient] = useState<IExtendedUser | null>(null);
+  const [deletingPatient, setDeletingPatient] = useState<IExtendedUser | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Fetch categories from Supabase
+  useEffect(() => {
+    const fetchUsersData = async () => {
+      const data = await fetchUsers();
+      setPatients(data);
+    };
+
+    fetchUsersData();
+  }, []);
 
   const router = useRouter();
   // Filter based on search term
   const filteredPatients = patients.filter(
     (patient) =>
       patient.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.mobile.includes(searchTerm)
+      patient.phone?.includes(searchTerm)
   );
 
   const totalPages = Math.ceil(
@@ -146,7 +157,7 @@ export function PatientsList() {
             <TableRow>
               <TableHead className="min-w-[130px]">Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead className="min-w-[130px]">Mobile</TableHead>
+              <TableHead className="min-w-[130px]">Phone</TableHead>
               <TableHead className="min-w-[130px]">Gender</TableHead>
               <TableHead className="min-w-[130px]">DOB</TableHead>
               <TableHead className="w-[100px] text-center">Actions</TableHead>
@@ -160,15 +171,19 @@ export function PatientsList() {
                     {patient.first_name} {patient.last_name}
                   </TableCell>
                   <TableCell>{patient.email}</TableCell>
-                  <TableCell>{patient.mobile}</TableCell>
+                  <TableCell>{patient.phone}</TableCell>
                   <TableCell className="capitalize">{patient.gender}</TableCell>
-                  <TableCell>{patient.dob}</TableCell>
+                  <TableCell>{patient.date_of_birth}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => router.push(`/dashboard?tab=patientBookings&patientId=${patient.id}`)}
+                        onClick={() =>
+                          router.push(
+                            `/dashboard?tab=patientBookings&patientId=${patient.id}`
+                          )
+                        }
                       >
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">View</span>

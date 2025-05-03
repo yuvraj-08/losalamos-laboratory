@@ -80,14 +80,8 @@ export default function PatientBookingsPage() {
         <h1 className="text-2xl font-semibold text-gray-800">My Bookings</h1>
       </div>
 
-      <div className="grid gap-6">
-        <div className="patient-card">
-          <PatientInfoCard patient={patient} />
-        </div>
-
-        <div className="bookings-list">
-          <BookingList bookings={bookings} isAdmin={false} />
-        </div>
+      <div className="bookings-list">
+        <BookingList bookings={bookings} />
       </div>
     </div>
   );

@@ -58,10 +58,10 @@ const formSchema = z.object({
   gender: z.string({
     required_error: "Please select a gender.",
   }),
-  dob: z.date({
+  date_of_birth: z.date({
     required_error: "Please select a date of birth.",
   }),
-  mobile: z.string().min(10, {
+  phone: z.string().min(10, {
     message: "Mobile number must be at least 10 digits.",
   }),
   address: z.string().min(5, {
@@ -72,15 +72,14 @@ const formSchema = z.object({
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const { appUser } = useCurrentUser();
-  console.log(appUser);
   // Mock user data - in a real app, this would come from an API
   const defaultValues = {
     first_name: appUser?.first_name || "",
     last_name: appUser?.last_name || "",
     email: appUser?.email || "",
     gender: appUser?.gender || "",
-    dob: (appUser?.dob && new Date(appUser.dob)) || new Date(),
-    mobile: appUser?.mobile || "",
+    date_of_birth: (appUser?.date_of_birth && new Date(appUser.date_of_birth)) || new Date(),
+    phone: appUser?.phone || "",
     address: appUser?.address || "",
   };
 
@@ -246,7 +245,7 @@ export default function ProfilePage() {
 
                 <FormField
                   control={form.control}
-                  name="dob"
+                  name="date_of_birth"
                   render={({ field }) => (
                     <FormItem className="form-field">
                       <FormLabel>Date of Birth</FormLabel>
@@ -289,7 +288,7 @@ export default function ProfilePage() {
 
               <FormField
                 control={form.control}
-                name="mobile"
+                name="phone"
                 render={({ field }) => (
                   <FormItem className="form-field">
                     <FormLabel>Mobile Number</FormLabel>

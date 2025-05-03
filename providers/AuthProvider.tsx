@@ -25,59 +25,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const pathname = usePathname();
 
-  const fetchSession = async () => {
-    const { data } = await supabase.auth.getSession();
-    const sessionUser = data.session?.user ?? null;
-
-    setSession(data.session);
-    setUser(sessionUser);
-    setLoading(false);
-
-    if (sessionUser?.id) {
-      await fetchAppUser(sessionUser.id);
-    } else {
+  // Unified session and app user fetcher
+  const fetchSessionAndUser = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      const sessionUser = data.session?.user ?? null;
+      setSession(data.session);
+      setUser(sessionUser);
+      if (sessionUser?.id) {
+        await fetchAppUser(sessionUser.id);
+      } else {
+        setAppUser(null);
+      }
+    } catch (err) {
+      setSession(null);
+      setUser(null);
       setAppUser(null);
+      console.error('Error fetching session:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchAppUser = async (authId: string) => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("auth_id", authId)
-      .single();
-
-    if (!error && data) {
-      setAppUser(data as IExtendedUser);
-    } else {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("auth_id", authId)
+        .single();
+      if (!error && data) {
+        setAppUser(data as IExtendedUser);
+      } else {
+        setAppUser(null);
+        if (error) console.error("Error fetching app user:", error?.message);
+      }
+    } catch (err) {
       setAppUser(null);
-      console.error("Error fetching app user:", error?.message);
+      console.error("Error fetching app user:", err);
     }
   };
 
   useEffect(() => {
-    const getInitialSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      const sessionUser = data.session?.user ?? null;
+    // On mount, fetch session and user
+    fetchSessionAndUser();
 
-      setSession(data.session);
-      setUser(sessionUser);
-      setLoading(false);
-
-      if (sessionUser?.id) {
-        await fetchAppUser(sessionUser.id);
-      }
-    };
-
-    getInitialSession();
-
+    // Listen for auth state changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         const sessionUser = session?.user ?? null;
-
         setSession(session);
         setUser(sessionUser);
-
         if (sessionUser?.id) {
           await fetchAppUser(sessionUser.id);
         } else {
@@ -86,12 +86,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      if (listener && listener.subscription && typeof listener.subscription.unsubscribe === 'function') {
+        listener.subscription.unsubscribe();
+      }
+    };
   }, []);
 
-  // Refresh on route change
+  // Optionally refresh app user on route change if session exists
   useEffect(() => {
-    fetchSession();
+    if (user?.id) {
+      fetchAppUser(user.id);
+    }
   }, [pathname]);
 
   return (

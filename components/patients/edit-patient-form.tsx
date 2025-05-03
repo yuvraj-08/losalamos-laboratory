@@ -31,8 +31,8 @@ const patientFormSchema = z.object({
     .min(2, { message: "First name must be at least 2 characters" }),
   last_name: z.string().optional(),
   gender: z.string().min(4, { message: "Please select a gender" }),
-  dob: z.string().min(4, { message: "Date of Birth is required" }),
-  mobile: z.string().min(10, { message: "Please enter a valid mobile number" }),
+  date_of_birth: z.string().min(4, { message: "Date of Birth is required" }),
+  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   address: z.string().min(2, { message: "Address is required" }),
 });
 
@@ -135,10 +135,10 @@ export function EditPatientForm({
 
             <FormField
               control={form.control}
-              name="mobile"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mobile</FormLabel>
+                  <FormLabel>Phone</FormLabel>
                   <FormControl>
                     <Input placeholder="+1 (555) 000-0000" {...field} />
                   </FormControl>
@@ -149,7 +149,7 @@ export function EditPatientForm({
 
             <FormField
               control={form.control}
-              name="dob"
+              name="date_of_birth"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Date of Birth</FormLabel>

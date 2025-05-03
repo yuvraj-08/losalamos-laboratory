@@ -31,15 +31,20 @@ import PatientDetailsPageForAdmin from "@/common/PatientDetailsPageForAdmin";
 import BookingDetailsPageForAdmin from "@/common/BookingDetailsPageForAdmin";
 import PatientBookingDetailsPage from "@/common/BookingDetailsPage";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCurrentUser } from "@/providers/AuthProvider";
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(tab ?? "patients");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { appUser } = useCurrentUser();
+  const [activeTab, setActiveTab] = useState(
+    (tab ?? appUser?.role === "admin") ? "patients" : "bookings"
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isMobile = useIsMobile(); // Adjust this value as needed for your mobile breakpoint
+  const router = useRouter();
   // Effect to update activeTab when search params change
   useEffect(() => {
     const currentTab = searchParams.get("tab");
@@ -52,7 +57,6 @@ export default function Dashboard() {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const router = useRouter();
   useEffect(() => {
     if (contentRef.current) {
       gsap.fromTo(
@@ -90,46 +94,66 @@ export default function Dashboard() {
             collapsed={!sidebarOpen}
           />
 
-          <SidebarItem
-            icon={<User size={20} />}
-            text="Patients"
-            active={activeTab === "patients"}
-            onClick={() => {
-              setActiveTab("patients");
-              isMobile && setSidebarOpen(false);
-            }}
-            collapsed={!sidebarOpen}
-          />
-          <SidebarItem
-            icon={<FlaskConical size={20} />}
-            text="Tests"
-            active={activeTab === "tests"}
-            onClick={() => {
-              setActiveTab("tests");
-              isMobile && setSidebarOpen(false);
-            }}
-            collapsed={!sidebarOpen}
-          />
-          <SidebarItem
-            icon={<FolderKanban size={20} />}
-            text="Test Categories"
-            active={activeTab === "test-categories"}
-            onClick={() => {
-              setActiveTab("test-categories");
-              isMobile && setSidebarOpen(false);
-            }}
-            collapsed={!sidebarOpen}
-          />
-          <SidebarItem
-            icon={<MapPin size={20} />}
-            text="Lab Branches"
-            active={activeTab === "lab-branches"}
-            onClick={() => {
-              setActiveTab("lab-branches");
-              isMobile && setSidebarOpen(false);
-            }}
-            collapsed={!sidebarOpen}
-          />
+          {appUser?.role === "admin" && (
+            <SidebarItem
+              icon={<User size={20} />}
+              text="Patients"
+              active={activeTab === "patients"}
+              onClick={() => {
+                setActiveTab("patients");
+                isMobile && setSidebarOpen(false);
+              }}
+              collapsed={!sidebarOpen}
+            />
+          )}
+          {appUser?.role === "admin" && (
+            <SidebarItem
+              icon={<FlaskConical size={20} />}
+              text="Tests"
+              active={activeTab === "tests"}
+              onClick={() => {
+                setActiveTab("tests");
+                isMobile && setSidebarOpen(false);
+              }}
+              collapsed={!sidebarOpen}
+            />
+          )}
+          {appUser?.role === "admin" && (
+            <SidebarItem
+              icon={<FolderKanban size={20} />}
+              text="Test Categories"
+              active={activeTab === "test-categories"}
+              onClick={() => {
+                setActiveTab("test-categories");
+                isMobile && setSidebarOpen(false);
+              }}
+              collapsed={!sidebarOpen}
+            />
+          )}
+          {appUser?.role === "admin" && (
+            <SidebarItem
+              icon={<MapPin size={20} />}
+              text="Lab Branches"
+              active={activeTab === "lab-branches"}
+              onClick={() => {
+                setActiveTab("lab-branches");
+                isMobile && setSidebarOpen(false);
+              }}
+              collapsed={!sidebarOpen}
+            />
+          )}
+          {appUser?.role === "user" && (
+            <SidebarItem
+              icon={<MapPin size={20} />}
+              text="My Bookings"
+              active={activeTab === "bookings"}
+              onClick={() => {
+                setActiveTab("bookings");
+                isMobile && setSidebarOpen(false);
+              }}
+              collapsed={!sidebarOpen}
+            />
+          )}
           {/* <SidebarItem
             icon={<ShieldCheck size={20} />}
             text="Admins"
@@ -177,7 +201,10 @@ export default function Dashboard() {
         </header>
 
         <main className="sm:p-6">
-          <div ref={contentRef} className="bg-white rounded-lg shadow-sm sm:px-6 py-6">
+          <div
+            ref={contentRef}
+            className="bg-white rounded-lg shadow-sm sm:px-6 py-6"
+          >
             <h2 className="text-xl font-semibold text-teal-700 mb-6">
               {activeTab === "patients" && "Patients Management"}
               {activeTab === "test-categories" && "Test Categories Management"}
@@ -192,7 +219,7 @@ export default function Dashboard() {
             {/* {activeTab === "admins" && <AdminsList />} */}
             {activeTab === "tests" && <TestList />}
             {activeTab === "profile" && <ProfilePage />}
-            {activeTab === "booking" && <PatientBookingsPage />}
+            {activeTab === "bookings" && <PatientBookingsPage />}
             {activeTab === "patientBookings" && <PatientDetailsPageForAdmin />}
             {activeTab === "adminViewBooking" && <BookingDetailsPageForAdmin />}
             {activeTab === "viewBooking" && <PatientBookingDetailsPage />}

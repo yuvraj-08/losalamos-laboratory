@@ -4,42 +4,6 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { IFormValues } from "@/types";
-
-export const signUpAction = async (formData: IFormValues) => {
-  const email = formData.email;
-  const password = formData.password;
-  const supabase = await createClient();
-  const origin = (await headers()).get("origin");
-
-  console.log(formData, "formDatatatatata");
-  // if (!email || !password) {
-  //   return encodedRedirect(
-  //     "error",
-  //     "/sign-up",
-  //     "Email and password are required"
-  //   );
-  // }
-
-  // const { error } = await supabase.auth.signUp({
-  //   email,
-  //   password,
-  //   options: {
-  //     emailRedirectTo: `${origin}/auth/callback`,
-  //   },
-  // });
-
-  // if (error) {
-  //   console.error(error.code + " " + error.message);
-  //   return encodedRedirect("error", "/sign-up", error.message);
-  // } else {
-  //   return encodedRedirect(
-  //     "success",
-  //     "/sign-up",
-  //     "Thanks for signing up! Please check your email for a verification link."
-  //   );
-  // }
-};
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;

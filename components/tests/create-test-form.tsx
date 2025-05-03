@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -31,18 +31,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createClient } from "@/utils/supabase/client";
+import { insertTest } from "@/utils/supabase/tests&categories";
 
-// New test schema
 const testFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   category: z.string().uuid().optional(),
   description: z.string().optional(),
-  duration: z.string().optional(), // For interval, can be changed based on how you input time
-  cost: z.number().optional(),
+  duration: z.string().optional(),
+  cost: z.string().optional(),
   ideal_range: z.string().optional(),
 });
 
-type TestFormValues = z.infer<typeof testFormSchema>;
+export type TestFormValues = z.infer<typeof testFormSchema>;
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface CreateTestFormProps {
   onSuccess?: () => void;
@@ -51,6 +57,7 @@ interface CreateTestFormProps {
 export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const form = useForm<TestFormValues>({
     resolver: zodResolver(testFormSchema),
@@ -59,28 +66,39 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
       category: "",
       description: "",
       duration: "",
-      cost: undefined,
+      cost: "",
       ideal_range: "",
     },
   });
 
+  useEffect(() => {
+    async function fetchCategories() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("test_category")
+        .select("id, name");
+
+      if (error) {
+        console.error("Error fetching categories:", error);
+        return;
+      }
+
+      setCategories(data || []);
+    }
+
+    fetchCategories();
+  }, []);
+
   async function onSubmit(data: TestFormValues) {
     setIsSubmitting(true);
-
-    try {
-      // Simulate API call for creating a test
-      console.log("Creating test:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Reset form and close dialog
-      form.reset();
-      setOpen(false);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      console.error("Error creating test:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    insertTest(data)
+      .then(() => {
+        form.reset();
+        setOpen(false);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (
@@ -96,6 +114,7 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Name */}
             <FormField
               control={form.control}
               name="name"
@@ -110,29 +129,33 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
               )}
             />
 
+            {/* Category */}
             <FormField
               control={form.control}
               name="category"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Select {...field}>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {/* You can populate SelectItems with your actual categories */}
-                        <SelectItem value="uuid-1">Blood Tests</SelectItem>
-                        <SelectItem value="uuid-2">Imaging</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
@@ -151,6 +174,7 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
               )}
             />
 
+            {/* Duration */}
             <FormField
               control={form.control}
               name="duration"
@@ -168,6 +192,7 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
               )}
             />
 
+            {/* Cost */}
             <FormField
               control={form.control}
               name="cost"
@@ -175,13 +200,14 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
                 <FormItem>
                   <FormLabel>Cost</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Cost" {...field} />
+                    <Input placeholder="Cost" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Ideal Range */}
             <FormField
               control={form.control}
               name="ideal_range"

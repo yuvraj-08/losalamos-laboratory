@@ -57,8 +57,7 @@ export default function SignInForm() {
     formData.append("password", values.password);
     formData.append("rememberMe", String(values.rememberMe ?? false));
     signInAction(formData)
-      .then((data) => {
-        console.log("Sign in data:", data);
+      .then(() => {
         toast.success("Signed in successfully");
         // Redirect to the dashboard or another page
         router.push("/dashboard");

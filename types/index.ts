@@ -3,25 +3,31 @@
 export type User = {
   id: string;
   first_name: string;
-  last_name: string;
+  last_name?: string;
   email: string;
   gender: string;
-  dob: string;
-  mobile: string;
+  date_of_birth: string;
+  phone: string;
   address: string;
 };
 
 export interface IExtendedUser extends User {
-  role: string;
-  auth_id: string;
-  created_at: string;
-  updated_at: string;
+  role?: string;
+  auth_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export type Lab = {
   id: string;
   name: string;
   address: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  phone: string;
+  email: string;
+  image?: string;
 };
 
 export type Booking = {
@@ -42,6 +48,11 @@ export type Test = {
   description: string;
   price: number;
   category: string;
+  preparation?: string;
+  duration?: string;
+  report_time?: string;
+  image?: string;
+  popular?: boolean;
 };
 
 export type TestResult = {
@@ -63,7 +74,32 @@ export interface IFormValues {
   password: string;
   confirmPassword: string;
   gender: "male" | "female" | "other";
-  dob: Date;
-  mobile: string;
+  date_of_birth: Date;
+  phone: string;
   address: string;
 }
+
+export type TestCategory = {
+  id: string;
+  name: string;
+  description?: string;
+  image?: string;
+  tests?: Test[];
+};
+
+export type CartItem = {
+  test: Test;
+  quantity: number;
+};
+
+export type BookingFormData = {
+  date: Date;
+  lab_id: string;
+  collection_location: "lab" | "home";
+  patient_details?: {
+    first_name: string;
+    last_name?: string;
+    email: string;
+    phone: string;
+  };
+};

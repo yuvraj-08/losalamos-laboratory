@@ -1,4 +1,4 @@
-import type { Booking, Lab, User, Test, TestResult } from "../types";
+import type { Booking, Lab, User, Test, TestResult, TestCategory } from "../types";
 
 // Mock data for development and testing
 
@@ -6,12 +6,32 @@ export const mockLabs: Lab[] = [
   {
     id: "lab-001",
     name: "Los Alamos Laboratory",
-    address: "123 Science Way, Los Alamos, NM 87544",
+    address: "123 Science Way",
+    city: "Los Alamos",
+    state: "NM",
+    zip: "87544",
+    phone: "+1 (555) 111-2233",
+    email: "info@losalamos-lab.com",
+    image: "/placeholder.svg?height=80&width=80",
   },
   {
     id: "lab-002",
     name: "Central Diagnostics",
-    address: "456 Health Blvd, Santa Fe, NM 87501",
+    address: "456 Health Blvd",
+    city: "Santa Fe",
+    state: "NM",
+    zip: "87501",
+    phone: "+1 (555) 444-5566",
+    email: "contact@centraldiagnostics.com",
+    image: "/placeholder.svg?height=80&width=80",
+  },
+  {
+    id: "lab-003",
+    name: "HealthFirst Labs",
+    address: "789 Medical Center Dr, Albuquerque, NM, 87102",
+    phone: "+1 (555) 777-8899",
+    email: "info@healthfirstlabs.com",
+    image: "/placeholder.svg?height=80&width=80",
   },
 ];
 
@@ -20,40 +40,207 @@ export const mockTests: Test[] = [
     id: "test-001",
     name: "Complete Blood Count (CBC)",
     description:
-      "Measures red and white blood cells, platelets, hemoglobin, and hematocrit",
+      "A complete blood count (CBC) is a blood test used to evaluate your overall health and detect a wide range of disorders, including anemia, infection and leukemia.",
     price: 45.99,
-    category: "Hematology",
+    category: "hematology",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "Same day",
+    popular: true,
   },
   {
     id: "test-002",
     name: "Lipid Panel",
     description:
-      "Measures cholesterol levels including HDL, LDL, and triglycerides",
+      "A lipid panel is a blood test that measures lipids—fats and fatty substances used as a source of energy by your body.",
     price: 65.5,
-    category: "Biochemistry",
+    category: "biochemistry",
+    preparation: "Fasting for 9-12 hours before the test.",
+    duration: "5-10 minutes",
+    report_time: "1-2 days",
+    popular: true,
   },
   {
     id: "test-003",
     name: "Thyroid Function Test",
-    description: "Measures thyroid hormones T3, T4, and TSH",
+    description:
+      "Thyroid function tests are blood tests that check how well your thyroid is working. They measure the level of thyroid hormones in the blood and the level of thyroid-stimulating hormone.",
     price: 85.75,
-    category: "Endocrinology",
+    category: "endocrinology",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "1-2 days",
+    popular: true,
   },
   {
     id: "test-004",
     name: "Liver Function Test",
-    description: "Measures enzymes and proteins that indicate liver function",
+    description:
+      "Liver function tests are blood tests that measure different enzymes and proteins in the liver. These tests check the overall health of your liver.",
     price: 55.25,
-    category: "Biochemistry",
+    category: "biochemistry",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "1-2 days",
   },
   {
     id: "test-005",
     name: "COVID-19 PCR Test",
-    description: "Detects genetic material of the SARS-CoV-2 virus",
+    description:
+      "A COVID-19 PCR test is a test used to diagnose people who are currently infected with SARS-CoV-2, which is the virus that causes COVID-19.",
     price: 120.0,
-    category: "Microbiology",
+    category: "microbiology",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "1-2 days",
+  },
+  {
+    id: "test-006",
+    name: "Hemoglobin A1C",
+    description:
+      "The hemoglobin A1C test measures the amount of blood sugar (glucose) attached to hemoglobin. It is used to diagnose diabetes and to monitor blood sugar control in people with diabetes.",
+    price: 75.0,
+    category: "endocrinology",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "1-2 days",
+  },
+  {
+    id: "test-007",
+    name: "Vitamin D Test",
+    description:
+      "A vitamin D test measures the level of vitamin D in your blood. Vitamin D is important for bone health and other functions in your body.",
+    price: 95.0,
+    category: "biochemistry",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "1-2 days",
+  },
+  {
+    id: "test-008",
+    name: "Urinalysis",
+    description:
+      "Urinalysis is a test of your urine. It is used to detect and manage a wide range of disorders, such as urinary tract infections, kidney disease and diabetes.",
+    price: 35.0,
+    category: "microbiology",
+    preparation: "Clean catch sample required.",
+    duration: "5-10 minutes",
+    report_time: "Same day",
+  },
+  {
+    id: "test-009",
+    name: "Blood Glucose Test",
+    description:
+      "A blood glucose test measures the amount of glucose in your blood. Glucose is a type of sugar and is your body's main source of energy.",
+    price: 40.0,
+    category: "biochemistry",
+    preparation: "Fasting for 8 hours before the test for fasting glucose.",
+    duration: "5-10 minutes",
+    report_time: "Same day",
+    popular: true,
+  },
+  {
+    id: "test-010",
+    name: "Electrolyte Panel",
+    description:
+      "An electrolyte panel is a blood test that measures the levels of electrolytes and carbon dioxide in your blood.",
+    price: 50.0,
+    category: "biochemistry",
+    preparation: "No special preparation is needed.",
+    duration: "5-10 minutes",
+    report_time: "Same day",
   },
 ];
+
+export const mockCategories: TestCategory[] = [
+  {
+    id: "cat-001",
+    name: "Hematology",
+    description: "Tests related to blood and blood disorders",
+    image: "/placeholder.svg?height=200&width=200",
+  },
+  {
+    id: "cat-002",
+    name: "Biochemistry",
+    description:
+      "Tests related to the chemical processes and substances in the body",
+    image: "/placeholder.svg?height=200&width=200",
+  },
+  {
+    id: "cat-003",
+    name: "Microbiology",
+    description:
+      "Tests related to microorganisms like bacteria, viruses, and fungi",
+    image: "/placeholder.svg?height=200&width=200",
+  },
+  {
+    id: "cat-004",
+    name: "Endocrinology",
+    description: "Tests related to hormones and the endocrine system",
+    image: "/placeholder.svg?height=200&width=200",
+  },
+];
+
+// Helper functions
+
+export const getTestById = (testId: string): Test | undefined => {
+  return mockTests.find((test) => test.id === testId);
+};
+
+export const getTestsByCategory = (categoryId: string): Test[] => {
+  const category = mockCategories.find((cat) => cat.id === categoryId);
+  if (!category) return [];
+
+  const categoryName = category.name.toLowerCase();
+  return mockTests.filter(
+    (test) => test.category.toLowerCase() === categoryName
+  );
+};
+
+export const getPopularTests = (): Test[] => {
+  return mockTests.filter((test) => test.popular);
+};
+
+export const getAllCategories = (): TestCategory[] => {
+  return mockCategories.map((category) => {
+    const tests = mockTests.filter(
+      (test) => test.category.toLowerCase() === category.name.toLowerCase()
+    );
+    return {
+      ...category,
+      tests,
+    };
+  });
+};
+
+export const getLabById = (labId: string): Lab | undefined => {
+  return mockLabs.find((lab) => lab.id === labId);
+};
+
+export const getAllLabs = (): Lab[] => {
+  return mockLabs;
+};
+
+// Uncomment and modify this function when integrating with Supabase
+/*
+export const fetchLabsFromSupabase = async (): Promise<Lab[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('lab_branches')
+      .select('*')
+    
+    if (error) {
+      console.error('Error fetching labs:', error)
+      return []
+    }
+    
+    return data as Lab[]
+  } catch (error) {
+    console.error('Error fetching labs:', error)
+    return []
+  }
+}
+*/
 
 export const mockPatients: User[] = [
   {
@@ -62,8 +249,8 @@ export const mockPatients: User[] = [
     last_name: "Johnson",
     email: "alice.johnson@example.com",
     gender: "female",
-    dob: "1985-04-12",
-    mobile: "+1 (555) 111-2233",
+    date_of_birth: "1985-04-12",
+    phone: "+1 (555) 111-2233",
     address: "789 Pine St, Los Alamos, NM 87544",
   },
   {
@@ -72,8 +259,8 @@ export const mockPatients: User[] = [
     last_name: "Smith",
     email: "bob.smith@example.com",
     gender: "male",
-    dob: "1978-09-23",
-    mobile: "+1 (555) 444-5566",
+    date_of_birth: "1978-09-23",
+    phone: "+1 (555) 444-5566",
     address: "101 Oak Ave, Santa Fe, NM 87501",
   },
   {
@@ -82,8 +269,8 @@ export const mockPatients: User[] = [
     last_name: "Martinez",
     email: "carla.martinez@example.com",
     gender: "female",
-    dob: "1990-12-02",
-    mobile: "+1 (555) 777-8899",
+    date_of_birth: "1990-12-02",
+    phone: "+1 (555) 777-8899",
     address: "202 Maple Dr, Albuquerque, NM 87102",
   },
 ];

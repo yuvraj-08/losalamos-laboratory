@@ -2,7 +2,7 @@
 
 import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -36,12 +36,23 @@ const testCategories = [
 
 const Navbar = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const dropdownTriggerRef = useRef<HTMLDivElement | null>(null);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
-  const { user, loading, appUser } = useCurrentUser();
+  const { user, appUser } = useCurrentUser();
+
   // GSAP animations for tests dropdown
-  const handleMouseEnter = () => {
+  const showDropdown = () => {
     if (dropdownRef.current) {
+      // Clear any pending timeouts
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+        dropdownTimeoutRef.current = null;
+      }
+
+      setIsDropdownOpen(true);
       gsap.killTweensOf(dropdownRef.current);
       gsap.to(dropdownRef.current, {
         autoAlpha: 1,
@@ -53,22 +64,36 @@ const Navbar = () => {
     }
   };
 
-  const handleMouseLeave = () => {
+  const hideDropdown = () => {
     if (dropdownRef.current) {
-      gsap.killTweensOf(dropdownRef.current);
-      gsap.to(dropdownRef.current, {
-        autoAlpha: 0,
-        y: -10,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: () => {
-          if (dropdownRef.current) {
-            dropdownRef.current.style.display = "none";
-          }
-        },
-      });
+      // Use a timeout to delay hiding the dropdown
+      dropdownTimeoutRef.current = setTimeout(() => {
+        gsap.killTweensOf(dropdownRef.current);
+        gsap.to(dropdownRef.current, {
+          autoAlpha: 0,
+          y: -10,
+          duration: 0.3,
+          ease: "power2.in",
+          onComplete: () => {
+            if (dropdownRef.current) {
+              dropdownRef.current.style.display = "none";
+              setIsDropdownOpen(false);
+            }
+          },
+        });
+      }, 100);
     }
   };
+
+  // Event handlers for mouse interactions
+  const handleMouseEnter = () => {
+    showDropdown();
+  };
+
+  const handleMouseLeave = () => {
+    hideDropdown();
+  };
+
   const supabase = createClient();
   const handleSignOut = async () => {
     try {
@@ -80,15 +105,24 @@ const Navbar = () => {
     }
   };
 
+  // Ensure dropdown is hidden initially
   useEffect(() => {
     if (dropdownRef.current) {
-      gsap.set(dropdownRef.current, { autoAlpha: 0, y: -10, display: "none" });
+      gsap.set(dropdownRef.current, {
+        autoAlpha: 0,
+        y: -10,
+        display: "none",
+      });
     }
+
+    // Cleanup timeouts on unmount
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
   }, []);
 
-  if (loading) {
-    return null; // or a loading spinner
-  }
   return (
     <>
       <header className="bg-emerald-50 py-4 px-4 md:px-8">
@@ -107,37 +141,43 @@ const Navbar = () => {
 
           {/* Desktop Navbar */}
           <nav className="hidden sm:flex flex-wrap justify-center gap-6 text-sm items-center">
-            <div
-              className="relative"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className="flex items-center hover:text-emerald-600 font-medium">
-                Tests <ChevronDown className="h-4 w-4 ml-1" />
-              </button>
+            <div className="relative group">
               <div
-                ref={dropdownRef}
-                className="absolute bg-white shadow-md rounded-md mt-2 py-2 w-56 z-20"
+                ref={dropdownTriggerRef}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                className="relative"
               >
-                {testCategories.map((category, idx) => (
-                  <div key={idx} className="px-4 py-2">
-                    <p className="font-semibold text-emerald-700">
-                      {category.category}
-                    </p>
-                    <ul className="mt-1 space-y-1">
-                      {category.tests.map((test, index) => (
-                        <li key={index}>
-                          <Link
-                            href="#"
-                            className="block text-gray-600 hover:text-emerald-600 text-sm"
-                          >
-                            - {test}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                <button className="flex items-center hover:text-emerald-600 font-medium">
+                  Tests <ChevronDown className="h-4 w-4 ml-1" />
+                </button>
+                <div
+                  ref={dropdownRef}
+                  className="absolute bg-white shadow-md rounded-md mt-2 py-2 w-56 z-20"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {testCategories.map((category, idx) => (
+                    <div key={idx} className="px-4 py-2">
+                      <p className="font-semibold text-emerald-700">
+                        {category.category}
+                      </p>
+                      <ul className="mt-1 space-y-1">
+                        {category.tests.map((test, index) => (
+                          <li key={index}>
+                            <Link
+                              href="#"
+                              className="block text-gray-600 hover:text-emerald-600 text-sm py-1"
+                              onClick={() => setIsDropdownOpen(false)}
+                            >
+                              - {test}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -228,7 +268,7 @@ const Navbar = () => {
                                   <Link
                                     href="#"
                                     onClick={() => setOpenDrawer(false)} // close on click
-                                    className="block text-gray-600 hover:text-emerald-600 text-sm"
+                                    className="block text-gray-600 hover:text-emerald-600 text-sm py-1"
                                   >
                                     - {test}
                                   </Link>
@@ -251,36 +291,26 @@ const Navbar = () => {
                     {/* Conditional rendering for mobile */}
                     {!user ? (
                       <>
-                        <AccordionItem value="login">
-                          <AccordionTrigger>Login</AccordionTrigger>
-                          <AccordionContent>
-                            <Link
-                              href="/sign-in"
-                              onClick={() => setOpenDrawer(false)}
-                              className="block text-gray-600 hover:text-emerald-600 py-2"
-                            >
-                              Login
-                            </Link>
-                          </AccordionContent>
-                        </AccordionItem>
-
-                        <AccordionItem value="signup">
-                          <AccordionTrigger>Sign Up</AccordionTrigger>
-                          <AccordionContent>
-                            <Link
-                              href="/sign-up"
-                              onClick={() => setOpenDrawer(false)}
-                              className="block text-gray-600 hover:text-emerald-600 py-2"
-                            >
-                              Sign Up
-                            </Link>
-                          </AccordionContent>
-                        </AccordionItem>
+                        <Link
+                          href="/sign-in"
+                          onClick={() => setOpenDrawer(false)}
+                          className="block text-gray-600 hover:text-emerald-600 py-2"
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          href="/sign-up"
+                          onClick={() => setOpenDrawer(false)}
+                          className="block text-gray-600 hover:text-emerald-600 py-2"
+                        >
+                          Sign Up
+                        </Link>
                       </>
                     ) : (
                       <>
                         <Link
                           href="/dashboard"
+                          onClick={() => setOpenDrawer(false)}
                           className="block text-gray-600 hover:text-emerald-600 py-2"
                         >
                           Dashboard

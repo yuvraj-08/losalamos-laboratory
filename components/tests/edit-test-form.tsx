@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { TestWithCategory } from "./tests-list";
 
 const testFormSchema = z.object({
   id: z.string().uuid(),
@@ -29,14 +30,14 @@ const testFormSchema = z.object({
   category: z.string().uuid().optional(),
   description: z.string().optional(),
   duration: z.string().optional(),
-  cost: z.number().optional(),
+  cost: z.string().optional(),
   ideal_range: z.string().optional(),
 });
 
 type TestFormValues = z.infer<typeof testFormSchema>;
 
 interface EditTestFormProps {
-  test: TestFormValues;
+  test: TestWithCategory;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;

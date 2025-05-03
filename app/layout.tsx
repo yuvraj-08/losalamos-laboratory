@@ -7,6 +7,8 @@ import FooterWrapper from "@/wrappers/FooterWrapper";
 import TopbarWrapper from "@/wrappers/TopbarWrapper";
 import { Slide, ToastContainer } from "react-toastify";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { CartProvider } from "@/providers/CartProvider";
+import { CartContainer } from "@/common/Cart/CartContainer";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -38,7 +40,11 @@ export default function RootLayout({
           {/* Header */}
           <NavbarWrapper />
           {/* Children */}
-          <Suspense fallback={<Loader />}>{children}</Suspense>
+          <CartProvider>
+            <Suspense fallback={<Loader />}>{children}</Suspense>
+
+            <CartContainer />
+          </CartProvider>
           {/* Footer */}
           <FooterWrapper />
         </AuthProvider>

@@ -35,7 +35,7 @@ export function PatientInfoCard({ patient }: PatientInfoCardProps) {
               <h3 className="text-sm font-medium text-gray-500">Phone</h3>
               <p className="mt-1 text-base flex items-center gap-2">
                 <Phone className="h-4 w-4 text-gray-400" />
-                {patient.mobile}
+                {patient.phone}
               </p>
             </div>
           </div>
@@ -50,7 +50,7 @@ export function PatientInfoCard({ patient }: PatientInfoCardProps) {
               </h3>
               <p className="mt-1 text-base flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-gray-400" />
-                {new Date(patient.dob).toLocaleDateString("en-US", {
+                {new Date(patient.date_of_birth).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
