@@ -46,6 +46,41 @@ export const fetchTests = async () => {
   }
 };
 
+//Function to delete a test in the "tests" table in Supabase
+export const deleteTest = async (id: string) => {
+  try {
+    const { error } = await supabase.from("tests").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting data:", error.message);
+      return;
+    }
+
+    toast.success("Test deleted successfully!");
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred : ${err}`);
+  }
+};
+export const updateTest = async (id: string, data: TestFormValues) => {
+  try {
+    const { error } = await supabase
+      .from("tests")
+      .update({ ...data })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating data:", error.message);
+      return;
+    }
+
+    toast.success("Test updated successfully!");
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred : ${err}`);
+  }
+};
+
 // Function to insert a new test category into the "test_category" table in Supabase
 export const insertTestCategory = async (name: string, description: string) => {
   try {

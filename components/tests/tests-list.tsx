@@ -77,18 +77,20 @@ export function TestList() {
   // Modal states
   const [editingTest, setEditingTest] = useState<TestWithCategory | null>(null);
   const [viewingTest, setViewingTest] = useState<TestWithCategory | null>(null);
-  const [deletingTest, setDeletingTest] = useState<TestWithCategory | null>(null);
+  const [deletingTest, setDeletingTest] = useState<TestWithCategory | null>(
+    null
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const fetchTestsData = async () => {
+    const data = await fetchTests();
+    setTests(data);
+  };
+
   // Fetch categories from Supabase
   useEffect(() => {
-    const fetchTestsData = async () => {
-      const data = await fetchTests();
-      setTests(data);
-    };
-
     fetchTestsData();
   }, []);
 
@@ -126,9 +128,7 @@ export function TestList() {
   };
 
   const handleDeleteSuccess = () => {
-    if (deletingTest) {
-      setTests(tests.filter((t) => t.id !== deletingTest.id));
-    }
+     fetchTestsData();
   };
 
   const handleCreateSuccess = () => {
@@ -138,7 +138,7 @@ export function TestList() {
 
   const handleEditSuccess = () => {
     // In a real app, you would fetch the updated list
-    console.log("Test updated successfully");
+    fetchTestsData();
   };
 
   return (

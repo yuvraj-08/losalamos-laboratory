@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { TestWithCategory } from "./tests-list";
+import { updateTest } from "@/utils/supabase/tests&categories";
 
 const testFormSchema = z.object({
   id: z.string().uuid(),
@@ -40,7 +41,7 @@ interface EditTestFormProps {
   test: TestWithCategory;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess: () => void;
 }
 
 export function EditTestForm({
@@ -65,19 +66,14 @@ export function EditTestForm({
 
   async function onSubmit(data: TestFormValues) {
     setIsSubmitting(true);
-
-    try {
-      // Simulate API call
-      console.log("Updating test:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      onOpenChange(false);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      console.error("Error updating test:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    updateTest(test.id, data)
+      .then(() => {
+        onOpenChange(false);
+        onSuccess();
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (
@@ -155,7 +151,7 @@ export function EditTestForm({
                 <FormItem>
                   <FormLabel>Cost</FormLabel>
                   <FormControl>
-                    <Input placeholder="Cost" type="number" {...field} />
+                    <Input placeholder="Cost" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

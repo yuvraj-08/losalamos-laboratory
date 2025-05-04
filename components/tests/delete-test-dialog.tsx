@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { deleteTest } from "@/utils/supabase/tests&categories";
 
 interface DeleteTestDialogProps {
   testId: string;
@@ -32,18 +33,14 @@ export function DeleteTestDialog({
   async function handleDelete() {
     setIsDeleting(true);
 
-    try {
-      // Simulate API call for deleting the test
-      console.log("Deleting test:", testId);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      onOpenChange(false);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      console.error("Error deleting test:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteTest(testId)
+      .then(() => {
+        onOpenChange(false);
+        if (onSuccess) onSuccess();
+      })
+      .finally(() => {
+        setIsDeleting(false);
+      });
   }
 
   return (
