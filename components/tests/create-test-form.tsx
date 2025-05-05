@@ -41,6 +41,9 @@ const testFormSchema = z.object({
   duration: z.string().optional(),
   cost: z.string().optional(),
   ideal_range: z.string().optional(),
+  popular: z.boolean(),
+  preparation: z.string().optional(),
+  report_time: z.string().optional(),
 });
 
 export type TestFormValues = z.infer<typeof testFormSchema>;
@@ -68,6 +71,9 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
       duration: "",
       cost: "",
       ideal_range: "",
+      popular: false,
+      preparation: "",
+      report_time: "",
     },
   });
 
@@ -93,6 +99,7 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
     setIsSubmitting(true);
     insertTest(data)
       .then(() => {
+        onSuccess && onSuccess();
         form.reset();
         setOpen(false);
       })
@@ -108,7 +115,7 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
           <Plus className="mr-2 h-4 w-4" /> Add Test
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Test</DialogTitle>
         </DialogHeader>
@@ -207,6 +214,7 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
               )}
             />
 
+
             {/* Ideal Range */}
             <FormField
               control={form.control}
@@ -216,6 +224,62 @@ export function CreateTestForm({ onSuccess }: CreateTestFormProps) {
                   <FormLabel>Ideal Range</FormLabel>
                   <FormControl>
                     <Input placeholder="Ideal range for the test" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Popular */}
+            <FormField
+              control={form.control}
+              name="popular"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Popular</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={val => field.onChange(val === "true")}
+                      value={field.value ? "true" : "false"}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Is this test popular?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Yes</SelectItem>
+                        <SelectItem value="false">No</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Prepration */}
+            <FormField
+              control={form.control}
+              name="preparation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Preparation</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Preparation instructions" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Report Time */}
+            <FormField
+              control={form.control}
+              name="report_time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Report Time</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Report time (e.g., 24 hours)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

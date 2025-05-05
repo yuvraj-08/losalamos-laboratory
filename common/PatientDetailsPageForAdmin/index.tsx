@@ -8,21 +8,42 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PatientInfoCard } from "@/components/patient-info-card";
 import { BookingList } from "@/components/booking-list";
-import {
-  getPatientById,
-  getPatientBookings,
-  getBookingWithDetails,
-} from "@/data/mock-data";
+import { fetchAllBookings, fetchUserById } from "@/utils/supabase/users";
+import { Booking } from "@/types";
+// import {
+//   getPatientById,
+//   getPatientBookings,
+//   getBookingWithDetails,
+// } from "@/data/mock-data";
 
 export default function PatientDetailsPageForAdmin() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [patient, setPatient] = useState(null);
+  const [bookings, setBookings] = useState<Booking[] | null>(null);
   const patientId = useSearchParams().get("patientId") || "";
-  const patient = getPatientById(patientId);
-  const bookings = getPatientBookings(patientId).map((booking) => {
-    const bookingWithDetails = getBookingWithDetails(booking.id);
-    return bookingWithDetails || booking;
-  });
+
+  const fetchPatient = async () => {
+    const data = await fetchUserById(patientId);
+    if (data) {
+      setPatient(data);
+    }
+    setIsLoading(false);
+  };
+  const fetchBookings = async () => {
+    const data = await fetchAllBookings(patientId);
+    if (data) {
+      setBookings(data);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (patientId) {
+      fetchPatient();
+      fetchBookings();
+    }
+  }, [patientId]);
 
   useEffect(() => {
     // Simulate data loading
@@ -82,6 +103,16 @@ export default function PatientDetailsPageForAdmin() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-semibold text-gray-800">Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center mb-6 page-header">
@@ -89,7 +120,7 @@ export default function PatientDetailsPageForAdmin() {
           variant="ghost"
           size="sm"
           className="mr-4"
-          onClick={() => router.back()}
+          onClick={() => router.replace("/dashboard?tab=patients")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
@@ -106,10 +137,7 @@ export default function PatientDetailsPageForAdmin() {
         </div>
 
         <div className="bookings-list">
-          <BookingList
-            bookings={bookings}
-            patientId={patientId}
-          />
+          <BookingList bookings={bookings} patientId={patientId} />
         </div>
       </div>
     </div>

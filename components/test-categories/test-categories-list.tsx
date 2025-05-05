@@ -1,92 +1,109 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Pencil, Trash2, Search } from "lucide-react"
-import { CreateTestCategoryForm } from "./create-test-category-form"
-import { EditTestCategoryForm } from "./edit-test-category-form"
-import { ViewTestCategoryDetails } from "./view-test-category-details"
-import { DeleteTestCategoryDialog } from "./delete-test-category-dialog"
-import { fetchTestCategories } from "@/utils/supabase/tests&categories"
+import { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, Pencil, Trash2, Search } from "lucide-react";
+import { CreateTestCategoryForm } from "./create-test-category-form";
+import { EditTestCategoryForm } from "./edit-test-category-form";
+import { ViewTestCategoryDetails } from "./view-test-category-details";
+import { DeleteTestCategoryDialog } from "./delete-test-category-dialog";
+import { fetchTestCategories } from "@/utils/supabase/tests&categories";
 
 interface TestCategory {
-  id: string
-  name: string
-  description?: string
+  id: string;
+  name: string;
+  description?: string;
 }
 
 export function TestCategoriesList() {
-  const [categories, setCategories] = useState<TestCategory[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState("10")
+  const [categories, setCategories] = useState<TestCategory[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState("10");
 
   // Modal states
-  const [editingCategory, setEditingCategory] = useState<TestCategory | null>(null)
-  const [viewingCategory, setViewingCategory] = useState<TestCategory | null>(null)
-  const [deletingCategory, setDeletingCategory] = useState<TestCategory | null>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<TestCategory | null>(
+    null
+  );
+  const [viewingCategory, setViewingCategory] = useState<TestCategory | null>(
+    null
+  );
+  const [deletingCategory, setDeletingCategory] = useState<TestCategory | null>(
+    null
+  );
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const fetchCategories = async () => {
+    const data = await fetchTestCategories();
+    setCategories(data);
+  };
   // Fetch categories from Supabase
   useEffect(() => {
-    const fetchCategories = async () => {
-      const data = await fetchTestCategories()
-      setCategories(data)
-    }
-
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   // Filter categories based on search term
   const filteredCategories = categories.filter(
     (category) =>
       category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase())),
-  )
+      (category.description &&
+        category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   // Pagination
-  const totalPages = Math.ceil(filteredCategories.length / Number.parseInt(itemsPerPage))
+  const totalPages = Math.ceil(
+    filteredCategories.length / Number.parseInt(itemsPerPage)
+  );
   const paginatedCategories = filteredCategories.slice(
     (currentPage - 1) * Number.parseInt(itemsPerPage),
-    currentPage * Number.parseInt(itemsPerPage),
-  )
+    currentPage * Number.parseInt(itemsPerPage)
+  );
 
   // Handlers
   const handleEdit = (category: TestCategory) => {
-    setEditingCategory(category)
-    setIsEditModalOpen(true)
-  }
+    setEditingCategory(category);
+    setIsEditModalOpen(true);
+  };
 
   const handleView = (category: TestCategory) => {
-    setViewingCategory(category)
-    setIsViewModalOpen(true)
-  }
+    setViewingCategory(category);
+    setIsViewModalOpen(true);
+  };
 
   const handleDelete = (category: TestCategory) => {
-    setDeletingCategory(category)
-    setIsDeleteModalOpen(true)
-  }
+    setDeletingCategory(category);
+    setIsDeleteModalOpen(true);
+  };
 
   const handleDeleteSuccess = () => {
-    if (deletingCategory) {
-      setCategories(categories.filter((c) => c.id !== deletingCategory.id))
-    }
-  }
+    fetchCategories();
+  };
 
   const handleCreateSuccess = () => {
-    // In a real app, you would fetch the updated list
-    console.log("Category created successfully")
-  }
+    fetchCategories();
+  };
 
   const handleEditSuccess = () => {
-    // In a real app, you would fetch the updated list
-    console.log("Category updated successfully")
-  }
+    fetchCategories();
+  };
 
   return (
     <div className="space-y-4">
@@ -126,11 +143,19 @@ export function TestCategoriesList() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleView(category)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleView(category)}
+                      >
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">View</span>
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(category)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(category)}
+                      >
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                       </Button>
@@ -162,13 +187,14 @@ export function TestCategoriesList() {
       <div className="flex max-sm:flex-col-reverse max-sm:gap-y-5 items-center justify-between">
         <div className="flex items-center space-x-2">
           <p className="text-sm text-muted-foreground">
-            Showing {paginatedCategories.length} of {filteredCategories.length} categories
+            Showing {paginatedCategories.length} of {filteredCategories.length}{" "}
+            categories
           </p>
           <Select
             value={itemsPerPage}
             onValueChange={(value) => {
-              setItemsPerPage(value)
-              setCurrentPage(1)
+              setItemsPerPage(value);
+              setCurrentPage(1);
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
@@ -196,7 +222,9 @@ export function TestCategoriesList() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages || totalPages === 0}
           >
             Next
@@ -214,7 +242,11 @@ export function TestCategoriesList() {
         />
       )}
 
-      <ViewTestCategoryDetails category={viewingCategory} open={isViewModalOpen} onOpenChange={setIsViewModalOpen} />
+      <ViewTestCategoryDetails
+        category={viewingCategory}
+        open={isViewModalOpen}
+        onOpenChange={setIsViewModalOpen}
+      />
 
       {deletingCategory && (
         <DeleteTestCategoryDialog
@@ -226,5 +258,5 @@ export function TestCategoriesList() {
         />
       )}
     </div>
-  )
+  );
 }

@@ -44,6 +44,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useCurrentUser } from "@/providers/AuthProvider";
+import { updateCurrentUserProfile } from "@/utils/supabase/users";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   first_name: z.string().min(2, {
@@ -72,13 +74,15 @@ const formSchema = z.object({
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const { appUser } = useCurrentUser();
+  const router = useRouter();
   // Mock user data - in a real app, this would come from an API
   const defaultValues = {
     first_name: appUser?.first_name || "",
     last_name: appUser?.last_name || "",
     email: appUser?.email || "",
     gender: appUser?.gender || "",
-    date_of_birth: (appUser?.date_of_birth && new Date(appUser.date_of_birth)) || new Date(),
+    date_of_birth:
+      (appUser?.date_of_birth && new Date(appUser.date_of_birth)) || new Date(),
     phone: appUser?.phone || "",
     address: appUser?.address || "",
   };
@@ -112,29 +116,34 @@ export default function ProfilePage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
-      setIsLoading(false);
+    const { date_of_birth, ...restValues } = values;
+    const userData = {
+      ...restValues,
+      date_of_birth: date_of_birth.toISOString(),
+      id: appUser?.id,
+    };
+    updateCurrentUserProfile(userData)
+      .then(() => {
+        const saveBtn = document.querySelector(".save-button");
+        if (saveBtn) {
+          gsap.to(saveBtn, {
+            backgroundColor: "rgb(22, 163, 74)",
+            duration: 0.3,
+            onComplete: () => {
+              gsap.to(saveBtn, {
+                backgroundColor: "",
+                duration: 0.5,
+                delay: 0.5,
+              });
+            },
+          });
+        }
 
-      // Success animation for the button
-      const saveBtn = document.querySelector(".save-button");
-      if (saveBtn) {
-        gsap.to(saveBtn, {
-          backgroundColor: "rgb(22, 163, 74)",
-          duration: 0.3,
-          onComplete: () => {
-            gsap.to(saveBtn, {
-              backgroundColor: "",
-              duration: 0.5,
-              delay: 0.5,
-            });
-          },
-        });
-      }
-
-      toast.success("Your profile information has been updated successfully.");
-    }, 1500);
+        router.replace("/dashboard?tab=patients");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (

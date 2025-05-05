@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { updateUser } from "@/utils/supabase/users";
 
 const patientFormSchema = z.object({
   id: z.string().uuid(),
@@ -66,16 +67,21 @@ export function EditPatientForm({
 
   async function onSubmit(data: PatientFormValues) {
     setIsSubmitting(true);
-    try {
-      console.log("Updating patient:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      onOpenChange(false);
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      console.error("Error updating patient:", error);
-    } finally {
-      setIsSubmitting(false);
+
+    const userData = {
+      ...data,
+      id: patient.id,
     }
+    updateUser(userData)
+      .then(() => {
+        onOpenChange(false);
+        if (onSuccess) {
+          onSuccess();
+        }
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (
@@ -124,6 +130,7 @@ export function EditPatientForm({
                   <FormControl>
                     <Input
                       type="email"
+                      readOnly
                       placeholder="patient@example.com"
                       {...field}
                     />

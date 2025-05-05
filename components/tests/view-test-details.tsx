@@ -72,6 +72,27 @@ export function ViewTestDetails({
                     <p className="mt-1">{test.ideal_range}</p>
                   </div>
                 )}
+
+                {typeof test.popular !== 'undefined' && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Popular</p>
+                    <p className="mt-1">{test.popular ? 'Yes' : 'No'}</p>
+                  </div>
+                )}
+
+                {test.preparation && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Preparation</p>
+                    <p className="mt-1">{test.preparation}</p>
+                  </div>
+                )}
+
+                {test.report_time && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Report Time</p>
+                    <p className="mt-1">{test.report_time}</p>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

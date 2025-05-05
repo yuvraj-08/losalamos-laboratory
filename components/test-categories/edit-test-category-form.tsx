@@ -1,60 +1,76 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { updateTestCategory } from "@/utils/supabase/tests&categories";
 
 const testCategoryFormSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   description: z.string().optional(),
-})
+});
 
-type TestCategoryFormValues = z.infer<typeof testCategoryFormSchema>
+type TestCategoryFormValues = z.infer<typeof testCategoryFormSchema>;
 
 interface EditTestCategoryFormProps {
-  category: TestCategoryFormValues
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  category: TestCategoryFormValues;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function EditTestCategoryForm({ category, open, onOpenChange, onSuccess }: EditTestCategoryFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function EditTestCategoryForm({
+  category,
+  open,
+  onOpenChange,
+  onSuccess,
+}: EditTestCategoryFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<TestCategoryFormValues>({
     resolver: zodResolver(testCategoryFormSchema),
     defaultValues: category,
-  })
+  });
 
   // Update form when category changes
   useEffect(() => {
     if (category && open) {
-      form.reset(category)
+      form.reset(category);
     }
-  }, [category, form, open])
+  }, [category, form, open]);
 
   async function onSubmit(data: TestCategoryFormValues) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
-    try {
-      // Simulate API call
-      console.log("Updating test category:", data)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+    updateTestCategory(data.id, data.name, data.description || "")
+      .then(() => {
+        onOpenChange(false);
 
-      onOpenChange(false)
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error("Error updating test category:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
+        if (onSuccess) onSuccess();
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (
@@ -98,10 +114,18 @@ export function EditTestCategoryForm({ category, open, onOpenChange, onSuccess }
             />
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-teal-600 hover:bg-teal-700" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-700"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Update Category"}
               </Button>
             </DialogFooter>
@@ -109,5 +133,5 @@ export function EditTestCategoryForm({ category, open, onOpenChange, onSuccess }
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,14 +10,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { deleteLabBranch } from "@/utils/supabase/lab-branches";
 
 interface DeleteLabBranchDialogProps {
-  branchId: string
-  branchName: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  branchId: string;
+  branchName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function DeleteLabBranchDialog({
@@ -27,23 +28,19 @@ export function DeleteLabBranchDialog({
   onOpenChange,
   onSuccess,
 }: DeleteLabBranchDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    setIsDeleting(true)
+    setIsDeleting(true);
 
-    try {
-      // Simulate API call
-      console.log("Deleting lab branch:", branchId)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      onOpenChange(false)
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error("Error deleting lab branch:", error)
-    } finally {
-      setIsDeleting(false)
-    }
+    deleteLabBranch(branchId)
+      .then(() => {
+        onOpenChange(false);
+        if (onSuccess) onSuccess();
+      })
+      .finally(() => {
+        setIsDeleting(false);
+      });
   }
 
   return (
@@ -52,8 +49,9 @@ export function DeleteLabBranchDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the lab branch <span className="font-medium">{branchName}</span> from the
-            system. This action cannot be undone.
+            This will permanently delete the lab branch{" "}
+            <span className="font-medium">{branchName}</span> from the system.
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -68,5 +66,5 @@ export function DeleteLabBranchDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

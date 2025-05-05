@@ -56,6 +56,7 @@ export function CreateTestCategoryForm({
     const { name, description } = data;
     insertTestCategory(name, description || "")
       .then(() => {
+        onSuccess && onSuccess();
         form.reset();
         setOpen(false);
       })

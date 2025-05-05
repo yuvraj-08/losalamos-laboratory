@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(null);
       setUser(null);
       setAppUser(null);
-      console.error('Error fetching session:', err);
+      console.error("Error fetching session:", err);
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
-      if (listener && listener.subscription && typeof listener.subscription.unsubscribe === 'function') {
+      if (
+        listener &&
+        listener.subscription &&
+        typeof listener.subscription.unsubscribe === "function"
+      ) {
         listener.subscription.unsubscribe();
       }
     };
@@ -99,6 +103,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       fetchAppUser(user.id);
     }
   }, [pathname]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, session, appUser, loading }}>

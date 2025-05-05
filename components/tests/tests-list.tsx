@@ -128,12 +128,12 @@ export function TestList() {
   };
 
   const handleDeleteSuccess = () => {
-     fetchTestsData();
+    fetchTestsData();
   };
 
   const handleCreateSuccess = () => {
     // In a real app, you would fetch the updated list
-    console.log("Test created successfully");
+    fetchTestsData();
   };
 
   const handleEditSuccess = () => {
@@ -165,9 +165,7 @@ export function TestList() {
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Duration</TableHead>
               <TableHead>Cost</TableHead>
-              <TableHead>Ideal Range</TableHead>
               <TableHead className="w-[100px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -182,9 +180,7 @@ export function TestList() {
                       ? `${test.description.substring(0, 100)}...`
                       : test.description}
                   </TableCell>
-                  <TableCell>{test.duration}</TableCell>
                   <TableCell>{test.cost}</TableCell>
-                  <TableCell>{test.ideal_range}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
                       <Button

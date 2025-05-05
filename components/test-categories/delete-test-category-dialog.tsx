@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,14 +10,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { deleteTestCategory } from "@/utils/supabase/tests&categories";
 
 interface DeleteTestCategoryDialogProps {
-  categoryId: string
-  categoryName: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  categoryId: string;
+  categoryName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function DeleteTestCategoryDialog({
@@ -27,23 +28,19 @@ export function DeleteTestCategoryDialog({
   onOpenChange,
   onSuccess,
 }: DeleteTestCategoryDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    setIsDeleting(true)
+    setIsDeleting(true);
 
-    try {
-      // Simulate API call
-      console.log("Deleting test category:", categoryId)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      onOpenChange(false)
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error("Error deleting test category:", error)
-    } finally {
-      setIsDeleting(false)
-    }
+    deleteTestCategory(categoryId)
+      .then(() => {
+        onOpenChange(false);
+        if (onSuccess) onSuccess();
+      })
+      .finally(() => {
+        setIsDeleting(false);
+      });
   }
 
   return (
@@ -52,8 +49,9 @@ export function DeleteTestCategoryDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the test category <span className="font-medium">{categoryName}</span> from the
-            system. This action cannot be undone.
+            This will permanently delete the test category{" "}
+            <span className="font-medium">{categoryName}</span> from the system.
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -68,5 +66,5 @@ export function DeleteTestCategoryDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

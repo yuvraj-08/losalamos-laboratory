@@ -32,17 +32,21 @@ import BookingDetailsPageForAdmin from "@/common/BookingDetailsPageForAdmin";
 import PatientBookingDetailsPage from "@/common/BookingDetailsPage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCurrentUser } from "@/providers/AuthProvider";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const contentRef = useRef<HTMLDivElement>(null);
   const { appUser } = useCurrentUser();
-  const [activeTab, setActiveTab] = useState(
-    (tab ?? appUser?.role === "admin") ? "patients" : "bookings"
-  );
+  const [activeTab, setActiveTab] = useState(() => {
+    if (tab) return tab;
+    if (appUser?.role === "admin") return "patients";
+    return "bookings";
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const supabase = createClient();
   const isMobile = useIsMobile(); // Adjust this value as needed for your mobile breakpoint
   const router = useRouter();
   // Effect to update activeTab when search params change
@@ -67,6 +71,15 @@ export default function Dashboard() {
     }
   }, [activeTab]);
 
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      router.push("/sign-in");
+    } catch (error: any) {
+      toast.error("Error logging out: " + error.message);
+    }
+  };
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
@@ -100,6 +113,7 @@ export default function Dashboard() {
               text="Patients"
               active={activeTab === "patients"}
               onClick={() => {
+                router.replace("/dashboard?tab=patients");
                 setActiveTab("patients");
                 isMobile && setSidebarOpen(false);
               }}
@@ -112,6 +126,7 @@ export default function Dashboard() {
               text="Tests"
               active={activeTab === "tests"}
               onClick={() => {
+                router.replace("/dashboard?tab=tests");
                 setActiveTab("tests");
                 isMobile && setSidebarOpen(false);
               }}
@@ -124,6 +139,7 @@ export default function Dashboard() {
               text="Test Categories"
               active={activeTab === "test-categories"}
               onClick={() => {
+                router.replace("/dashboard?tab=test-categories");
                 setActiveTab("test-categories");
                 isMobile && setSidebarOpen(false);
               }}
@@ -136,6 +152,7 @@ export default function Dashboard() {
               text="Lab Branches"
               active={activeTab === "lab-branches"}
               onClick={() => {
+                router.replace("/dashboard?tab=lab-branches");
                 setActiveTab("lab-branches");
                 isMobile && setSidebarOpen(false);
               }}
@@ -148,6 +165,7 @@ export default function Dashboard() {
               text="My Bookings"
               active={activeTab === "bookings"}
               onClick={() => {
+                router.replace("/dashboard?tab=bookings");
                 setActiveTab("bookings");
                 isMobile && setSidebarOpen(false);
               }}
@@ -166,6 +184,7 @@ export default function Dashboard() {
             text="Profile"
             active={activeTab === "profile"}
             onClick={() => {
+              router.replace("/dashboard?tab=profile");
               setActiveTab("profile");
               isMobile && setSidebarOpen(false);
             }}
@@ -174,7 +193,9 @@ export default function Dashboard() {
           <SidebarItem
             icon={<LogOut size={20} />}
             text="Logout"
-            onClick={() => {}}
+            onClick={() => {
+              handleSignOut();
+            }}
             collapsed={!sidebarOpen}
           />
         </nav>

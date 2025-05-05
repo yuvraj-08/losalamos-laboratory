@@ -33,6 +33,9 @@ const testFormSchema = z.object({
   duration: z.string().optional(),
   cost: z.string().optional(),
   ideal_range: z.string().optional(),
+  popular: z.boolean(),
+  preparation: z.string().optional(),
+  report_time: z.string().optional(),
 });
 
 type TestFormValues = z.infer<typeof testFormSchema>;
@@ -54,7 +57,18 @@ export function EditTestForm({
 
   const form = useForm<TestFormValues>({
     resolver: zodResolver(testFormSchema),
-    defaultValues: test,
+    defaultValues: {
+      id: test.id ?? "",
+      name: test.name ?? "",
+      category: test.test_category?.id ?? "",
+      description: test.description ?? "",
+      duration: test.duration ?? "",
+      cost: test.cost ?? "",
+      ideal_range: test.ideal_range ?? "",
+      popular: typeof test.popular === "boolean" ? test.popular : false,
+      preparation: test.preparation ?? "",
+      report_time: test.report_time ?? "",
+    },
   });
 
   // Update form when test changes
@@ -78,7 +92,7 @@ export function EditTestForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Test</DialogTitle>
         </DialogHeader>
@@ -166,6 +180,58 @@ export function EditTestForm({
                   <FormLabel>Ideal Range</FormLabel>
                   <FormControl>
                     <Input placeholder="Ideal range" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Popular */}
+            <FormField
+              control={form.control}
+              name="popular"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Popular</FormLabel>
+                  <FormControl>
+                    <select
+                      className="input"
+                      value={field.value ? "true" : "false"}
+                      onChange={e => field.onChange(e.target.value === "true")}
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Preparation */}
+            <FormField
+              control={form.control}
+              name="preparation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Preparation</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Preparation instructions" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Report Time */}
+            <FormField
+              control={form.control}
+              name="report_time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Report Time</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Report time (e.g., 24 hours)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

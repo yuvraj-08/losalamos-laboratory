@@ -1,64 +1,81 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { updateLabBranch } from "@/utils/supabase/lab-branches";
 
 const labBranchFormSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  address: z.string().min(5, { message: "Address must be at least 5 characters" }),
+  address: z
+    .string()
+    .min(5, { message: "Address must be at least 5 characters" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   opening_hours: z.string().optional(),
   manager_name: z.string().optional(),
-})
+});
 
-type LabBranchFormValues = z.infer<typeof labBranchFormSchema>
+type LabBranchFormValues = z.infer<typeof labBranchFormSchema>;
 
 interface EditLabBranchFormProps {
-  branch: LabBranchFormValues
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  branch: LabBranchFormValues;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function EditLabBranchForm({ branch, open, onOpenChange, onSuccess }: EditLabBranchFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function EditLabBranchForm({
+  branch,
+  open,
+  onOpenChange,
+  onSuccess,
+}: EditLabBranchFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LabBranchFormValues>({
     resolver: zodResolver(labBranchFormSchema),
     defaultValues: branch,
-  })
+  });
 
   // Update form when branch changes
   useEffect(() => {
     if (branch && open) {
-      form.reset(branch)
+      form.reset(branch);
     }
-  }, [branch, form, open])
+  }, [branch, form, open]);
 
   async function onSubmit(data: LabBranchFormValues) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
-    try {
-      // Simulate API call
-      console.log("Updating lab branch:", data)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      onOpenChange(false)
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      console.error("Error updating lab branch:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateLabBranch(branch.id, data)
+      .then(() => {
+        onOpenChange(false);
+        if (onSuccess) onSuccess();
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   }
 
   return (
@@ -90,7 +107,11 @@ export function EditLabBranchForm({ branch, open, onOpenChange, onSuccess }: Edi
                 <FormItem>
                   <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Full address" className="resize-none min-h-[80px]" {...field} />
+                    <Textarea
+                      placeholder="Full address"
+                      className="resize-none min-h-[80px]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -119,7 +140,11 @@ export function EditLabBranchForm({ branch, open, onOpenChange, onSuccess }: Edi
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="branch@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="branch@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -134,7 +159,10 @@ export function EditLabBranchForm({ branch, open, onOpenChange, onSuccess }: Edi
                 <FormItem>
                   <FormLabel>Opening Hours</FormLabel>
                   <FormControl>
-                    <Input placeholder="Mon-Fri: 9am-5pm, Sat: 10am-2pm" {...field} />
+                    <Input
+                      placeholder="Mon-Fri: 9am-5pm, Sat: 10am-2pm"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -156,10 +184,18 @@ export function EditLabBranchForm({ branch, open, onOpenChange, onSuccess }: Edi
             />
 
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-teal-600 hover:bg-teal-700" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-700"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Update Branch"}
               </Button>
             </DialogFooter>
@@ -167,5 +203,5 @@ export function EditLabBranchForm({ branch, open, onOpenChange, onSuccess }: Edi
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

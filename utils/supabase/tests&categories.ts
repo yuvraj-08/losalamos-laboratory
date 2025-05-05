@@ -62,6 +62,8 @@ export const deleteTest = async (id: string) => {
     toast.error(`An error occurred : ${err}`);
   }
 };
+
+// Function to update a test in the "tests" table in Supabase
 export const updateTest = async (id: string, data: TestFormValues) => {
   try {
     const { error } = await supabase
@@ -115,5 +117,49 @@ export const fetchTestCategories = async () => {
     console.error("Unexpected error:", err);
     toast.error(`An error occurred: ${err}`);
     return [];
+  }
+};
+
+// Function to edit a test category in the "test_category" table in Supabase
+export const updateTestCategory = async (
+  id: string,
+  name: string,
+  description?: string
+) => {
+  try {
+    const { error } = await supabase
+      .from("test_category")
+      .update({ name, description })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating data:", error.message);
+      return;
+    }
+
+    toast.success("Test category updated successfully!");
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred : ${err}`);
+  }
+};
+
+// Function to delete a test category in the "test_category" table in Supabase
+export const deleteTestCategory = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from("test_category")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting data:", error.message);
+      return;
+    }
+
+    toast.success("Test category deleted successfully!");
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred : ${err}`);
   }
 };

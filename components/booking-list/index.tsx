@@ -20,7 +20,7 @@ import { StatusBadge } from "../status-badge";
 import { useCurrentUser } from "@/providers/AuthProvider";
 
 type BookingListProps = {
-  bookings: Booking[];
+  bookings: Booking[] | null;
   patientId?: string;
 };
 
@@ -73,7 +73,7 @@ export function BookingList({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bookings.length === 0 ? (
+              {bookings?.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={7}
@@ -83,7 +83,7 @@ export function BookingList({
                   </TableCell>
                 </TableRow>
               ) : (
-                bookings.map((booking, index) => (
+                bookings?.map((booking, index) => (
                   <TableRow key={booking.id} className="booking-row">
                     <TableCell className="font-medium">{booking.id}</TableCell>
                     <TableCell>

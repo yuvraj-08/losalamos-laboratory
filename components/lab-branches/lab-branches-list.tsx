@@ -85,7 +85,7 @@ interface LabBranch {
 }
 
 export function LabBranchesList() {
-  const [branches, setBranches] = useState<LabBranch[]>(mockBranches);
+  const [branches, setBranches] = useState<LabBranch[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
@@ -98,13 +98,12 @@ export function LabBranchesList() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const fetchBranches = async () => {
+    const data = await fetchLabBranches();
+    setBranches(data);
+  };
   // Fetch categories from Supabase
   useEffect(() => {
-    const fetchBranches = async () => {
-      const data = await fetchLabBranches();
-      setBranches(data);
-    };
-
     fetchBranches();
   }, []);
 
@@ -145,19 +144,19 @@ export function LabBranchesList() {
   };
 
   const handleDeleteSuccess = () => {
-    if (deletingBranch) {
-      setBranches(branches.filter((b) => b.id !== deletingBranch.id));
-    }
+    fetchBranches();
   };
 
   const handleCreateSuccess = () => {
     // In a real app, you would fetch the updated list
-    console.log("Branch created successfully");
+
+    fetchBranches();
   };
 
   const handleEditSuccess = () => {
     // In a real app, you would fetch the updated list
-    console.log("Branch updated successfully");
+
+    fetchBranches();
   };
 
   return (

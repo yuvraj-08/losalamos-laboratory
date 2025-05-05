@@ -11,10 +11,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { deleteUser, deleteUserFromAuth } from "@/utils/supabase/users";
 
 interface DeletePatientDialogProps {
   patientId: string;
   patientName: string;
+  auth_id: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
@@ -26,24 +28,22 @@ export function DeletePatientDialog({
   open,
   onOpenChange,
   onSuccess,
+  auth_id,
 }: DeletePatientDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
     setIsDeleting(true);
 
-    try {
-      // Simulate API call
-      console.log("Deleting patient:", patientId);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      onOpenChange(false);
-      onSuccess?.();
-    } catch (error) {
-      console.error("Error deleting patient:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteUser(patientId)
+      .then(async () => {
+        await deleteUserFromAuth(auth_id);
+        onOpenChange(false);
+        onSuccess?.();
+      })
+      .finally(() => {
+        setIsDeleting(false);
+      });
   }
 
   return (

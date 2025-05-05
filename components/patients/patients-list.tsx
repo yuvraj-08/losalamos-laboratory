@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Eye, Pencil, Trash2, Search } from "lucide-react";
-import { ViewPatientDetails } from "./view-patient-details";
+// import { ViewPatientDetails } from "./view-patient-details";
 // import { CreatePatientForm } from "./create-patient-form";
 import { EditPatientForm } from "./edit-patient-form";
 import { DeletePatientDialog } from "./delete-patient-dialog";
@@ -69,20 +69,23 @@ export function PatientsList() {
   const [itemsPerPage, setItemsPerPage] = useState("10");
 
   // Modal states
-  const [editingPatient, setEditingPatient] = useState<IExtendedUser | null>(null);
-  const [viewingPatient, setViewingPatient] = useState<IExtendedUser | null>(null);
-  const [deletingPatient, setDeletingPatient] = useState<IExtendedUser | null>(null);
+  const [editingPatient, setEditingPatient] = useState<IExtendedUser | null>(
+    null
+  );
+  // const [viewingPatient, setViewingPatient] = useState<IExtendedUser | null>(null);
+  const [deletingPatient, setDeletingPatient] = useState<IExtendedUser | null>(
+    null
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  // const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const fetchUsersData = async () => {
+    const data = await fetchUsers();
+    setPatients(data);
+  };
   // Fetch categories from Supabase
   useEffect(() => {
-    const fetchUsersData = async () => {
-      const data = await fetchUsers();
-      setPatients(data);
-    };
-
     fetchUsersData();
   }, []);
 
@@ -131,7 +134,7 @@ export function PatientsList() {
   // };
 
   const handleEditSuccess = () => {
-    console.log("Patient updated successfully");
+    fetchUsersData();
   };
 
   return (
@@ -279,14 +282,15 @@ export function PatientsList() {
         />
       )}
 
-      <ViewPatientDetails
+      {/* <ViewPatientDetails
         patient={viewingPatient}
         open={isViewModalOpen}
         onOpenChange={setIsViewModalOpen}
-      />
+      /> */}
 
       {deletingPatient && (
         <DeletePatientDialog
+          auth_id={deletingPatient.auth_id || ""}
           patientId={deletingPatient.id}
           patientName={`${deletingPatient.first_name} ${deletingPatient.last_name}`}
           open={isDeleteModalOpen}

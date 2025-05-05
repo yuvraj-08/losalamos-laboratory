@@ -1,6 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { toast } from "react-toastify";
 
 export async function GET(request: Request) {
   // The `/auth/callback` route is required for the server-side auth flow implemented
@@ -21,6 +20,5 @@ export async function GET(request: Request) {
   }
 
   // URL to redirect to after sign up process completes
-  toast.success("Account verified successfully");
-  return NextResponse.redirect(`${origin}/sign-in`);
+  return NextResponse.redirect(`${origin}/sign-in?verified=true`);
 }
