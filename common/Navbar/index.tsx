@@ -15,6 +15,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
 import { gsap } from "gsap";
 import { UserDropdown } from "../UserDropdown";
 import { useCurrentUser } from "@/providers/AuthProvider";
@@ -22,17 +23,10 @@ import { getUserInitials } from "@/utils/text";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { TestCategoriesDropdown } from "./TestCategoriesDropdown";
 
-const testCategories = [
-  {
-    category: "Blood Tests",
-    tests: ["CBC", "Blood Sugar", "Cholesterol", "Liver Function"],
-  },
-  {
-    category: "Imaging Tests",
-    tests: ["X-Ray", "MRI", "CT Scan", "Ultrasound"],
-  },
-];
+
+
 
 const Navbar = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -141,45 +135,7 @@ const Navbar = () => {
 
           {/* Desktop Navbar */}
           <nav className="hidden sm:flex flex-wrap justify-center gap-6 text-sm items-center">
-            <div className="relative group">
-              <div
-                ref={dropdownTriggerRef}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                className="relative"
-              >
-                <button className="flex items-center hover:text-emerald-600 font-medium">
-                  Tests <ChevronDown className="h-4 w-4 ml-1" />
-                </button>
-                <div
-                  ref={dropdownRef}
-                  className="absolute bg-white shadow-md rounded-md mt-2 py-2 w-56 z-20"
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  {testCategories.map((category, idx) => (
-                    <div key={idx} className="px-4 py-2">
-                      <p className="font-semibold text-emerald-700">
-                        {category.category}
-                      </p>
-                      <ul className="mt-1 space-y-1">
-                        {category.tests.map((test, index) => (
-                          <li key={index}>
-                            <Link
-                              href="#"
-                              className="block text-gray-600 hover:text-emerald-600 text-sm py-1"
-                              onClick={() => setIsDropdownOpen(false)}
-                            >
-                              - {test}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <TestCategoriesDropdown />
 
             <Link
               href="/about-us"
@@ -257,26 +213,8 @@ const Navbar = () => {
                     <AccordionItem value="tests">
                       <AccordionTrigger>Tests</AccordionTrigger>
                       <AccordionContent>
-                        {testCategories.map((category, idx) => (
-                          <div key={idx} className="mb-4">
-                            <p className="font-semibold text-emerald-700">
-                              {category.category}
-                            </p>
-                            <ul className="mt-1 space-y-1 ml-4">
-                              {category.tests.map((test, index) => (
-                                <li key={index}>
-                                  <Link
-                                    href="#"
-                                    onClick={() => setOpenDrawer(false)} // close on click
-                                    className="block text-gray-600 hover:text-emerald-600 text-sm py-1"
-                                  >
-                                    - {test}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
+                        {/* Use the same dropdown component for mobile, but with a prop to close drawer on click */}
+                        <TestCategoriesDropdown mobile onTestClick={() => setOpenDrawer(false)} />
                       </AccordionContent>
                     </AccordionItem>
 

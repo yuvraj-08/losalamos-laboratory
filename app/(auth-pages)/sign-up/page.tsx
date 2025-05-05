@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import { handleSignUpAction } from "@/utils/supabase/auth";
 import { useRouter } from "next/navigation";
 
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
 const formSchema = z
   .object({
     firstName: z.string().min(2, {
@@ -40,12 +42,11 @@ const formSchema = z
     email: z.string().email({
       message: "Please enter a valid email address.",
     }),
-    password: z.string().min(8, {
-      message: "Password must be at least 8 characters.",
+    password: z.string().min(8).regex(passwordRegex, {
+      message:
+        "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.",
     }),
-    confirmPassword: z.string().min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    confirmPassword: z.string().min(8),
     gender: z.enum(["male", "female", "other"], {
       required_error: "Please select a gender.",
     }),
