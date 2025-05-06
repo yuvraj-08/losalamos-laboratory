@@ -34,7 +34,6 @@ export const fetchLabBranches = async () => {
   } catch (err) {
     console.error("Unexpected error:", err);
     toast.error(`An error occurred: ${err}`);
-    return [];
   }
 };
 

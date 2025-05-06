@@ -100,7 +100,7 @@ export function LabBranchesList() {
 
   const fetchBranches = async () => {
     const data = await fetchLabBranches();
-    setBranches(data);
+    data && setBranches(data);
   };
   // Fetch categories from Supabase
   useEffect(() => {

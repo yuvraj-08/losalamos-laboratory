@@ -8,7 +8,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getAllCategories, getPopularTests } from "@/data/mock-data";
+import { fetchTestCategories, fetchTestsAndCategories, fetchPopularTests } from "@/utils/supabase/tests&categories";
 import type { Test, TestCategory } from "@/types";
 import { TestCard } from "@/components/TestCard";
 
@@ -21,81 +21,105 @@ export default function TestsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<TestCategory[]>([]);
-  const [popularTests, setPopularTests] = useState<Test[]>([]);
+  const [popularTests, setPopularTests] = useState<any[]>([]);
+  const [allTests, setAllTests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data
-    const fetchedCategories = getAllCategories();
-    const fetchedPopularTests = getPopularTests();
+    // Fetch categories, all tests with categories, and popular tests from Supabase
+    async function fetchData() {
+      setLoading(true);
+      try {
+        // Fetch categories
+        const categoriesData = await fetchTestCategories();
+        setCategories(categoriesData || []);
 
-    setCategories(fetchedCategories);
-    setPopularTests(fetchedPopularTests);
+        // Fetch all tests with categories
+        const testsData = await fetchTestsAndCategories();
+        setAllTests(testsData || []);
 
-    // Animate header
+        // Fetch popular tests
+        const popularData = await fetchPopularTests();
+        setPopularTests(popularData || []);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+
+    // Animate header and search bar
     const headerTimeline = gsap.timeline();
     headerTimeline.fromTo(
       ".page-header",
       { opacity: 0, y: -20 },
       { opacity: 1, y: 0, duration: 0.5 }
     );
-
-    // Animate search bar
     headerTimeline.fromTo(
       ".search-container",
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.5 },
       "-=0.3"
     );
-
-    // Set up scroll animations for categories
-    gsap.utils.toArray(".category-section").forEach((section: any, i) => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: "top 80%",
-        onEnter: () => {
-          gsap.fromTo(
-            section.querySelector(".category-header"),
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.5 }
-          );
-        },
-      });
-    });
   }, []);
+
+  // Animate category sections on scroll
+  useEffect(() => {
+    if (!loading) {
+      gsap.utils.toArray(".category-section").forEach((section: any) => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top 80%",
+          onEnter: () => {
+            gsap.fromTo(
+              section.querySelector(".category-header"),
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0, duration: 0.5 }
+            );
+          },
+        });
+      });
+    }
+  }, [loading, categories]);
+
+  // Group tests by category for display
+  const getCategoriesWithTests = () => {
+    // Map category id to category object
+    const categoryMap: Record<string, TestCategory> = {};
+    categories.forEach((cat) => {
+      categoryMap[cat.id] = { ...cat, tests: [] };
+    });
+    // Assign tests to their categories
+    allTests.forEach((test) => {
+      const catId = test.test_category?.id || test.category;
+      if (catId && categoryMap[catId]) {
+        if (!categoryMap[catId].tests) categoryMap[catId].tests = [];
+        categoryMap[catId].tests!.push(test);
+      }
+    });
+    // Return as array
+    return Object.values(categoryMap);
+  };
 
   // Filter tests based on search query and active category
   const getFilteredTests = () => {
     if (!searchQuery && !activeCategory) {
       return null; // Show all categories
     }
-
-    const filteredTests: Test[] = [];
-
-    categories.forEach((category) => {
-      if (category.tests) {
-        category.tests.forEach((test) => {
-          // Filter by search query
-          const matchesSearch = searchQuery
-            ? test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              test.description.toLowerCase().includes(searchQuery.toLowerCase())
-            : true;
-
-          // Filter by category
-          const matchesCategory = activeCategory
-            ? category.id === activeCategory
-            : true;
-
-          if (matchesSearch && matchesCategory) {
-            filteredTests.push(test);
-          }
-        });
-      }
+    // Filter from allTests
+    return allTests.filter((test) => {
+      const matchesSearch = searchQuery
+        ? (test.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            test.description?.toLowerCase().includes(searchQuery.toLowerCase()))
+        : true;
+      const matchesCategory = activeCategory
+        ? (test.test_category?.id === activeCategory || test.category === activeCategory)
+        : true;
+      return matchesSearch && matchesCategory;
     });
-
-    return filteredTests;
   };
 
   const filteredTests = getFilteredTests();
+  const categoriesWithTests = getCategoriesWithTests();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -145,7 +169,9 @@ export default function TestsPage() {
         </div>
       </div>
 
-      {filteredTests ? (
+      {loading ? (
+        <div className="text-center py-12 text-gray-500">Loading...</div>
+      ) : filteredTests ? (
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4">Search Results</h2>
           {filteredTests.length > 0 ? (
@@ -177,7 +203,7 @@ export default function TestsPage() {
                   Most frequently booked diagnostic tests
                 </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {popularTests.map((test) => (
                   <TestCard key={test.id} test={test} />
                 ))}
@@ -186,16 +212,22 @@ export default function TestsPage() {
           )}
 
           {/* Categories Sections */}
-          {categories.map((category) => (
+          {categoriesWithTests.map((category) => (
             <div key={category.id} className="mb-12 category-section">
               <div className="category-header mb-6">
                 <h2 className="text-2xl font-semibold">{category.name}</h2>
                 <p className="text-gray-500 mt-1">{category.description}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {category.tests?.map((test) => (
-                  <TestCard key={test.id} test={test} />
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {category.tests && category.tests.length > 0 ? (
+                  category.tests.map((test: any) => (
+                    <TestCard key={test.id} test={test} />
+                  ))
+                ) : (
+                  <div className="col-span-3 text-gray-400 italic">
+                    No tests in this category.
+                  </div>
+                )}
               </div>
               <Separator className="mt-12" />
             </div>

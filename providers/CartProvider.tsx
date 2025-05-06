@@ -17,19 +17,19 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  // Load cart from localStorage on initial render
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error("Failed to parse cart from localStorage:", error);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        try {
+          return JSON.parse(savedCart);
+        } catch (error) {
+          console.error("Failed to parse cart from localStorage:", error);
+        }
       }
     }
-  }, []);
+    return [];
+  });
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -76,7 +76,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getTotalPrice = () => {
     return items.reduce(
-      (total, item) => total + item.test.price * item.quantity,
+      (total, item) => total + Number(item.test.cost) * item.quantity,
       0
     );
   };

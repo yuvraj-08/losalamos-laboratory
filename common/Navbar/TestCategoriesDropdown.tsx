@@ -6,6 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { createClient } from "@/utils/supabase/client";
 import { GroupedTestCategory, Test } from "./types";
+import {
+  fetchPopularTests,
+  fetchTestsAndCategories,
+} from "@/utils/supabase/tests&categories";
 
 // // TODO: Replace with Supabase fetch logic
 // const mockTestCategories = [
@@ -117,42 +121,51 @@ export const TestCategoriesDropdown = ({
     };
   }, [isDropdownOpen, mobile]);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchTests = async () => {
-      const supabase = createClient()
+      const supabase = createClient();
 
       const { data, error } = await supabase
         .from("tests")
-        .select("id, name, test_category:category ( name )")
-
+        .select("id, name, test_category:category ( name )");
 
       if (error) {
-        console.error("Error fetching tests:", error)
-        return
+        console.error("Error fetching tests:", error);
+        return;
       }
 
       // Type assertion to help TS understand the shape
-      const typedData = data as Test[]
+      const typedData = data as Test[];
 
-      const grouped = typedData.reduce<Record<string, { id: string; name: string }[]>>((acc, curr) => {
-        const categoryName = curr.test_category?.name || "Uncategorized"
+      const grouped = typedData.reduce<
+        Record<string, { id: string; name: string }[]>
+      >((acc, curr) => {
+        const categoryName = curr.test_category?.name || "Uncategorized";
         if (!acc[categoryName]) {
-          acc[categoryName] = []
+          acc[categoryName] = [];
         }
-        acc[categoryName].push({ id: curr.id, name: curr.name })
-        return acc
-      }, {})
+        acc[categoryName].push({ id: curr.id, name: curr.name });
+        return acc;
+      }, {});
 
-      const formatted: GroupedTestCategory[] = Object.entries(grouped).map(([category, tests]) => ({
-        category,
-        tests,
-      }))
+      const formatted: GroupedTestCategory[] = Object.entries(grouped).map(
+        ([category, tests]) => ({
+          category,
+          tests,
+        })
+      );
 
-      setTestCategories(formatted)
-    }
+      setTestCategories(formatted);
+    };
 
-    fetchTests()
-  }, [])
+    fetchTests();
+  }, []);
+
+  useEffect(() => {
+    fetchPopularTests();
+    fetchTestsAndCategories();
+  }, []);
+
   // Mobile: always open, no button.
   if (mobile) {
     return (
@@ -202,7 +215,7 @@ export const TestCategoriesDropdown = ({
       >
         <div className="flex justify-between items-start">
           <div className="grid grid-cols-3 gap-8 w-full">
-            {testCategories.map((category, idx) => (
+            {testCategories.slice(0, 3).map((category, idx) => (
               <div key={idx} className="mb-4">
                 <p className="font-semibold text-emerald-700 border-b border-gray-100 pb-1 mb-2">
                   {category.category}
@@ -223,7 +236,10 @@ export const TestCategoriesDropdown = ({
               </div>
             ))}
           </div>
-          <div className="ml-6 mt-2 border-l pl-6 h-full">
+          <div
+            className="ml-6 mt-2 border-l pl-6 h-full"
+            onClick={() => setIsDropdownOpen(false)}
+          >
             <Link
               href="/tests"
               className="flex items-center text-emerald-600 hover:text-emerald-700 font-medium text-sm whitespace-nowrap transition-colors duration-200"

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getTestById } from "@/data/mock-data";
+import { fetchTestById } from "@/utils/supabase/tests&categories";
 import type { Test } from "@/types";
 import { useCart } from "@/providers/CartProvider";
 import { useRouter } from "next/navigation";
@@ -23,41 +23,41 @@ export default function TestDetailsPage({
 
  const { testId } = use(params);
   const { addItem, isInCart } = useCart();
-  const [test, setTest] = useState<Test | null>(null);
+  const [test, setTest] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch test data
-    const fetchedTest = getTestById(testId);
+    async function fetchTest() {
+      setLoading(true);
+      const fetchedTest = await fetchTestById(testId);
+      if (fetchedTest) {
+        setTest(fetchedTest);
+      } else {
+        setTest(null);
+      }
+      setLoading(false);
 
-    if (fetchedTest) {
-      setTest(fetchedTest);
+      // Animations
+      const timeline = gsap.timeline({ delay: 0.2 });
+      timeline.fromTo(
+        ".page-header",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.5 }
+      );
+      timeline.fromTo(
+        ".test-details",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        "-=0.3"
+      );
+      timeline.fromTo(
+        ".test-actions",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        "-=0.3"
+      );
     }
-
-    setLoading(false);
-
-    // Animations
-    const timeline = gsap.timeline({ delay: 0.2 });
-
-    timeline.fromTo(
-      ".page-header",
-      { opacity: 0, y: -20 },
-      { opacity: 1, y: 0, duration: 0.5 }
-    );
-
-    timeline.fromTo(
-      ".test-details",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5 },
-      "-=0.3"
-    );
-
-    timeline.fromTo(
-      ".test-actions",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5 },
-      "-=0.3"
-    );
+    fetchTest();
   }, [testId]);
 
   const handleAddToCart = () => {
@@ -92,6 +92,7 @@ export default function TestDetailsPage({
       </div>
     );
   }
+
 
   if (!test) {
     return (
@@ -167,7 +168,7 @@ export default function TestDetailsPage({
                     <div>
                       <p className="font-medium">Category</p>
                       <p className="text-gray-600 capitalize">
-                        {test.category}
+                        {test.test_category.name}
                       </p>
                     </div>
                   </div>
@@ -218,7 +219,7 @@ export default function TestDetailsPage({
 
               <div className="mb-6">
                 <p className="text-3xl font-bold text-teal-600">
-                  ${test.price.toFixed(2)}
+                  ${test.cost}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
                   Inclusive of all taxes

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { format } from "date-fns";
 import {
@@ -39,12 +39,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { mockLabs } from "@/data/mock-data";
 import type { BookingFormData } from "@/types";
 import { toast } from "react-toastify";
 import { useCart } from "@/providers/CartProvider";
+import { fetchLabBranches } from "@/utils/supabase/lab-branches";
 
 type CartModalProps = {
   open: boolean;
@@ -59,7 +58,22 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
     lab_id: "",
     collection_location: "lab",
   });
+  const [labs, setLabs] = useState<any[]>([]);
 
+  useEffect(() => {
+    const fetchLabs = async () => {
+      fetchLabBranches().then((labs) => {
+        if (labs) {
+          setLabs(labs);
+        } else {
+          toast.error("Failed to fetch labs. Please try again later.");
+        }
+      });
+    };
+
+    fetchLabs();
+  }, []);
+  
   const handleNextStep = () => {
     if (items.length === 0) {
       toast.error("Please add some tests to your cart before proceeding.");
@@ -188,7 +202,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                         <div className="flex-1">
                           <h4 className="font-medium">{item.test.name}</h4>
                           <p className="text-sm text-gray-500">
-                            ${item.test.price.toFixed(2)}
+                            ${item.test.cost}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -309,7 +323,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                     <SelectValue placeholder="Select a lab" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockLabs.map((lab) => (
+                    {labs.map((lab) => (
                       <SelectItem key={lab.id} value={lab.id}>
                         {lab.name}
                       </SelectItem>

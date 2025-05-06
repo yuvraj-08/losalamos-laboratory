@@ -163,3 +163,80 @@ export const deleteTestCategory = async (id: string) => {
     toast.error(`An error occurred : ${err}`);
   }
 };
+
+// Function to fetch all tests and their categories from Supabase
+export const fetchTestsAndCategories = async () => {
+  try {
+    const { data, error } = await supabase.from("tests").select(`
+        *,
+        test_category:category (
+          id,
+          name,
+          description
+        )
+      `);
+
+    if (error) {
+      console.error("Error fetching data:", error.message);
+      return [];
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred: ${err}`);
+    return [];
+  }
+};
+
+// Function to fetch popular tests from Supabase
+export const fetchPopularTests = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("tests")
+      .select(`*`)
+      .order("created_at", { ascending: false })
+      .eq("popular", true)
+      .limit(5);
+
+    if (error) {
+      console.error("Error fetching data:", error.message);
+      return [];
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred: ${err}`);
+    return [];
+  }
+};
+
+// Function to fetch test by ID from Supabase
+export const fetchTestById = async (id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("tests")
+      .select(
+      `*,
+       test_category:category (
+        id,
+        name,
+        description
+      )`
+      )
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching data:", error.message);
+      return null;
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error(`An error occurred: ${err}`);
+    return null;
+  }
+};

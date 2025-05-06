@@ -46,7 +46,7 @@ export type Test = {
   id: string;
   name: string;
   description: string;
-  price: number;
+  cost: string;
   category: string;
   preparation?: string;
   duration?: string;

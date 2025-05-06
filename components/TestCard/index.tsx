@@ -75,7 +75,7 @@ export function TestCard({ test, variant = "default" }: TestCardProps) {
           </p>
         </CardContent>
         <CardFooter className="p-4 pt-0 flex justify-between items-center">
-          <p className="font-medium text-teal-600">${test.price.toFixed(2)}</p>
+          <p className="font-medium text-teal-600">${test.cost  }</p>
           <Button
             size="sm"
             className={`add-to-cart-btn ${alreadyInCart ? "bg-teal-700" : "bg-teal-600"} hover:bg-teal-700 text-white`}
@@ -144,7 +144,7 @@ export function TestCard({ test, variant = "default" }: TestCardProps) {
       <CardFooter className="p-6 pt-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <p className="font-medium text-lg text-teal-600">
-            ${test.price.toFixed(2)}
+            ${test.cost}
           </p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
