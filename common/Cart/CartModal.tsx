@@ -145,7 +145,6 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
         const testBookingPayload = {
           booking_id: bookingId,
           test_id: item.test.id,
-          quantity: item.quantity,
         };
         await import("@/utils/supabase/bookings").then(mod => mod.insertTestsBooking(testBookingPayload));
       }
