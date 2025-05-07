@@ -94,7 +94,7 @@ export type CartItem = {
 
 export type BookingFormData = {
   date: Date;
-  lab_id: string;
+  lab: string;
   collection_location: "lab" | "home";
   patient_details?: {
     first_name: string;

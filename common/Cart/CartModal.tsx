@@ -44,6 +44,8 @@ import type { BookingFormData } from "@/types";
 import { toast } from "react-toastify";
 import { useCart } from "@/providers/CartProvider";
 import { fetchLabBranches } from "@/utils/supabase/lab-branches";
+import { useCurrentUser } from "@/providers/AuthProvider";
+import { createBooking, fetchLatestBookingIdForUser } from "@/utils/supabase/bookings";
 
 type CartModalProps = {
   open: boolean;
@@ -51,11 +53,12 @@ type CartModalProps = {
 };
 
 export function CartModal({ open, onOpenChange }: CartModalProps) {
+  const { appUser } = useCurrentUser();
   const { items, removeItem, addItem, getTotalPrice, clearCart } = useCart();
   const [step, setStep] = useState<"cart" | "booking">("cart");
   const [bookingData, setBookingData] = useState<BookingFormData>({
     date: new Date(),
-    lab_id: "",
+    lab: "",
     collection_location: "lab",
   });
   const [labs, setLabs] = useState<any[]>([]);
@@ -73,7 +76,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
 
     fetchLabs();
   }, []);
-  
+
   const handleNextStep = () => {
     if (items.length === 0) {
       toast.error("Please add some tests to your cart before proceeding.");
@@ -101,7 +104,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate form
@@ -110,27 +113,53 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
       return;
     }
 
-    if (!bookingData.lab_id) {
+    if (!bookingData.lab) {
       toast.error("Please select a lab for your booking.");
       return;
     }
 
-    // In a real app, this would submit the booking to your API
-    console.log("Booking data:", {
+    // Prepare booking payload
+    const addBookingsPayload = {
+      user_id: appUser?.id,
       ...bookingData,
-      tests: items.map((item) => ({
-        test_id: item.test.id,
-        quantity: item.quantity,
-      })),
+      status: "pending",
       total_price: getTotalPrice(),
-    });
+    };
 
-    toast.success("Your booking has been submitted successfully.");
+    try {
+      await createBooking(addBookingsPayload);
+      // Fetch the latest booking id for this user
 
-    // Clear cart and close modal
-    clearCart();
-    onOpenChange(false);
-    setStep("cart");
+      if (!appUser?.id) {
+        toast.error("User not found. Please sign in again.");
+        return;
+      }
+      const bookingId = await fetchLatestBookingIdForUser(appUser.id);
+      if (!bookingId) {
+        toast.error("Failed to get booking ID after creation.");
+        return;
+      }
+
+      // Insert each test in the cart into tests_bookings
+      for (const item of items) {
+        const testBookingPayload = {
+          booking_id: bookingId,
+          test_id: item.test.id,
+          quantity: item.quantity,
+        };
+        await import("@/utils/supabase/bookings").then(mod => mod.insertTestsBooking(testBookingPayload));
+      }
+
+      // Clear cart and close modal
+      clearCart();
+      setStep("cart");
+      toast.success("Your booking has been submitted successfully.");
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error creating booking or test bookings:", error);
+      toast.error("Failed to create booking. Please try again.");
+      onOpenChange(false);
+    }
   };
 
   // Animate the content when it appears
@@ -314,9 +343,9 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
               <div className="space-y-2">
                 <Label htmlFor="lab">Select Lab</Label>
                 <Select
-                  value={bookingData.lab_id}
+                  value={bookingData.lab}
                   onValueChange={(value) =>
-                    setBookingData({ ...bookingData, lab_id: value })
+                    setBookingData({ ...bookingData, lab: value })
                   }
                 >
                   <SelectTrigger id="lab">
