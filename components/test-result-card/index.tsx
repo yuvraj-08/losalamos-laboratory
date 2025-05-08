@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Download, FileText, Upload } from "lucide-react";
+import { saveAs } from "file-saver";
 
 import type { Test, TestResult } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -27,10 +28,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { StatusBadge } from "@/components/status-badge";
+// import { StatusBadge } from "@/components/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "react-toastify";
-import { updateResult } from "@/utils/supabase/bookings";
+import { updateDocLink, updateResult } from "@/utils/supabase/bookings";
+import { uploadFileToSupabase } from "@/utils/supabase/file-upload";
+import { createClient } from "@/utils/supabase/client";
 
 type TestResultCardProps = {
   test: Test;
@@ -76,6 +79,7 @@ export function TestResultCard({
 
     const updateResultsPayload = {
       ...data,
+      status: "completed",
       performed_at: new Date().toISOString(),
     };
 
@@ -86,26 +90,30 @@ export function TestResultCard({
     toast.success("Test result has been updated successfully.");
   };
 
-  const handleFileSubmit = (data: z.infer<typeof fileUploadSchema>) => {
+  const handleFileSubmit = async (data: z.infer<typeof fileUploadSchema>) => {
     if (!isAdmin) return;
 
     setIsSubmitting(true);
 
-    // Simulate API call for file upload
-    setTimeout(() => {
-      // if (onResultUpdate) {
-      //   onResultUpdate(test.id, {
-      //     linkToReport: `/reports/${data.file.name}`,
-      //     status: "completed",
-      //     performed_at: new Date().toISOString(),
-      //   });
-      // }
+    try {
+      const fileUrl = await uploadFileToSupabase(data.file);
 
-      setIsSubmitting(false);
+      await updateDocLink(test.id, {
+        doc_link: fileUrl,
+        status: "completed",
+        performed_at: new Date().toISOString(),
+      });
+
+      onResultUpdate();
+      toast.success("Test report has been uploaded successfully.");
       setSelectedFile(null);
-
-      toast("Test report has been uploaded successfully.");
-    }, 1500);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred.";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,11 +124,36 @@ export function TestResultCard({
     }
   };
 
-  const handleDownload = () => {
-    if (!result?.linkToReport) return;
+  const handleDownload = async () => {
+    if (!result?.doc_link) return;
 
-    // In a real app, this would trigger a download from your API
-    toast("Your report download has started.");
+    const supabase = createClient();
+
+    const { data, error } = await supabase.storage
+      .from("test-results")
+      .download(result.doc_link); // now result.doc_link = just filename
+
+    if (error) {
+      toast.error("Failed to download file.");
+      return;
+    }
+
+    saveAs(data, `${test.name || "report"}.pdf`);
+    toast.success("Your report download has started.");
+    // fetch(result.doc_link)
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error("Failed to download file.");
+    //     }
+    //     return response.blob();
+    //   })
+    //   .then((blob) => {
+    //     saveAs(blob, `${test.name || "report"}.pdf`);
+    //     toast.success("Your report download has started.");
+    //   })
+    //   .catch((error) => {
+    //     toast.error(error.message);
+    //   });
   };
 
   return (
@@ -135,7 +168,7 @@ export function TestResultCard({
         <p className="text-sm text-gray-500 mt-1">{test?.description}</p>
       </CardHeader>
       <CardContent className="pt-4">
-        {isAdmin && (!result?.result_value) ? (
+        {isAdmin && !result?.result_value ? (
           <Tabs defaultValue="form">
             <TabsList className="mb-4">
               <TabsTrigger value="form">Enter Results</TabsTrigger>
@@ -283,7 +316,7 @@ export function TestResultCard({
                 <h3 className="text-sm font-medium text-gray-500">Result</h3>
                 <p className="mt-1 text-sm whitespace-pre-line">
                   {result.result_value}
-                </p> 
+                </p>
               </div>
             )}
 
@@ -319,7 +352,7 @@ export function TestResultCard({
         )}
       </CardContent>
 
-      {result?.linkToReport && (
+      {result?.doc_link && (
         <CardFooter className="border-t pt-4 flex justify-end">
           <Button
             variant="outline"

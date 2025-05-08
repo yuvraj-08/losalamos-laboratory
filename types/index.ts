@@ -62,7 +62,7 @@ export type TestResult = {
   test?: string;
   result_value: string | null;
   remarks: string | null;
-  linkToReport: string | null;
+  doc_link: string | null;
   performed_at: string | null;
   status: "pending" | "completed" | "in-progress";
 };

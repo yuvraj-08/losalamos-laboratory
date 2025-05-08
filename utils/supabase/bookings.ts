@@ -111,3 +111,20 @@ export async function updateResult(testId: string, data: any) {
     toast.error("Failed to update test result. Please try again.");
   }
 }
+
+export async function updateDocLink(testId: string, data: any) {
+  try {
+    const { data: updatedData, error } = await supabase
+      .from("tests_bookings")
+      .update(data)
+      .eq("test_id", testId);
+
+    if (error) {
+      toast.error("Error updating document link: " + error.message);
+    }
+    return updatedData;
+  } catch (err) {
+    console.error("Error updating document link:", err);
+    toast.error("Failed to update document link. Please try again.");
+  }
+}
