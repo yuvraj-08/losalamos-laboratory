@@ -22,30 +22,34 @@ import type { TestResult } from "@/types";
 import { fetchUserById } from "@/utils/supabase/users";
 import { fetchLabBranches } from "@/utils/supabase/lab-branches";
 import { createClient } from "@/utils/supabase/client";
-// We'll create fetchBookingWithDetails and fetchTestResultsForBooking below
+import {
+  fetchBookingTests,
+  fetchUserBookings,
+} from "@/utils/supabase/bookings";
 
 export default function BookingDetailsPageForAdmin() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
-  const patientId = useSearchParams().get("patientId") || "";
   const bookingId = useSearchParams().get("bookingId") || "";
   const [patient, setPatient] = useState<any>(null);
   const [booking, setBooking] = useState<any>(null);
   const [lab, setLab] = useState<any>(null);
 
-  useEffect(() => {
+  const fetchTestsBookings = async () => {
+    const data = await fetchBookingTests(bookingId);
+    setTestResults(data || []);
+  };
 
+  useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
+
       const supabase = createClient();
       // Fetch booking details
-      const { data: bookingData, error: bookingError } = await supabase
-        .from("bookings")
-        .select("*, users(*), lab_branches(*)")
-        .eq("id", bookingId)
-        .single();
+      const bookingData = await fetchUserBookings(bookingId);
       setBooking(bookingData);
+
       // Fetch patient
       if (bookingData?.user_id) {
         const patientData = await fetchUserById(bookingData.user_id);
@@ -61,11 +65,8 @@ export default function BookingDetailsPageForAdmin() {
         setLab(labs);
       }
       // Fetch test results
-      const { data: testResultsData } = await supabase
-        .from("test_results")
-        .select("*, test:tests(*)")
-        .eq("booking_id", bookingId);
-      setTestResults(testResultsData || []);
+      fetchTestsBookings();
+
       setIsLoading(false);
     }
     fetchData();
@@ -98,12 +99,13 @@ export default function BookingDetailsPageForAdmin() {
     };
   }, [bookingId]);
 
-  const handleResultUpdate = (testId: string, data: any) => {
-    setTestResults((prev) =>
-      prev.map((result) =>
-        result.test_id === testId ? { ...result, ...data } : result
-      )
-    );
+  const handleResultUpdate = () => {
+    // setTestResults((prev) =>
+    //   prev.map((result) =>
+    //     result.test_id.id === testId ? { ...result, ...data } : result
+    //   )
+    // );
+    fetchTestsBookings();
   };
 
   if (isLoading) {
@@ -242,7 +244,7 @@ export default function BookingDetailsPageForAdmin() {
               testResults.map((result) => (
                 <div key={result.id} className="test-result-card">
                   <TestResultCard
-                    test={result.test!}
+                    test={result.test_id!}
                     result={result}
                     isAdmin={true}
                     onResultUpdate={handleResultUpdate}

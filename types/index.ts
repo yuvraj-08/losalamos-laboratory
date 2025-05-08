@@ -37,7 +37,7 @@ export type Booking = {
   status: "completed" | "pending" | "cancelled" | "in-progress" | null;
   date: string;
   lab: string;
-  lab_details?: Lab;
+  lab_branches?: Lab;
   total_price: number;
   tests?: Test[];
 };
@@ -58,8 +58,8 @@ export type Test = {
 export type TestResult = {
   id: string;
   booking_id: string;
-  test_id: string;
-  test?: Test;
+  test_id: Test;
+  test?: string;
   result_value: string | null;
   remarks: string | null;
   linkToReport: string | null;

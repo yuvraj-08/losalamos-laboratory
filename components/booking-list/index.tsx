@@ -31,6 +31,7 @@ export function BookingList({
 
   const {appUser} = useCurrentUser();
   const isAdmin = appUser?.role === "admin";
+
   useEffect(() => {
     const timeline = gsap.timeline();
 
@@ -67,7 +68,6 @@ export function BookingList({
                 <TableHead>Date</TableHead>
                 <TableHead>Lab</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -94,16 +94,10 @@ export function BookingList({
                       })}
                     </TableCell>
                     <TableCell>
-                      {booking.lab_details?.name || booking.lab}
+                      {booking.lab_branches?.name || booking.lab}
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={booking.status} />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge
-                        status={booking.payment_status}
-                        type="payment"
-                      />
                     </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-1">

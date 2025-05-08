@@ -30,12 +30,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { StatusBadge } from "@/components/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "react-toastify";
+import { updateResult } from "@/utils/supabase/bookings";
 
 type TestResultCardProps = {
   test: Test;
   result?: TestResult;
   isAdmin?: boolean;
-  onResultUpdate?: (testId: string, data: any) => void;
+  onResultUpdate: () => void;
 };
 
 const resultFormSchema = z.object({
@@ -68,25 +69,21 @@ export function TestResultCard({
     resolver: zodResolver(fileUploadSchema),
   });
 
-  const handleResultSubmit = (data: z.infer<typeof resultFormSchema>) => {
+  const handleResultSubmit = async (data: z.infer<typeof resultFormSchema>) => {
     if (!isAdmin) return;
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      if (onResultUpdate) {
-        onResultUpdate(test.id, {
-          ...data,
-          status: "completed",
-          performed_at: new Date().toISOString(),
-        });
-      }
+    const updateResultsPayload = {
+      ...data,
+      performed_at: new Date().toISOString(),
+    };
 
-      setIsSubmitting(false);
+    await updateResult(test.id, updateResultsPayload);
 
-      toast.success("Test result has been updated successfully.");
-    }, 1000);
+    setIsSubmitting(false);
+    onResultUpdate();
+    toast.success("Test result has been updated successfully.");
   };
 
   const handleFileSubmit = (data: z.infer<typeof fileUploadSchema>) => {
@@ -96,18 +93,18 @@ export function TestResultCard({
 
     // Simulate API call for file upload
     setTimeout(() => {
-      if (onResultUpdate) {
-        onResultUpdate(test.id, {
-          linkToReport: `/reports/${data.file.name}`,
-          status: "completed",
-          performed_at: new Date().toISOString(),
-        });
-      }
+      // if (onResultUpdate) {
+      //   onResultUpdate(test.id, {
+      //     linkToReport: `/reports/${data.file.name}`,
+      //     status: "completed",
+      //     performed_at: new Date().toISOString(),
+      //   });
+      // }
 
       setIsSubmitting(false);
       setSelectedFile(null);
 
-      toast( "Test report has been uploaded successfully.");
+      toast("Test report has been uploaded successfully.");
     }, 1500);
   };
 
@@ -130,13 +127,15 @@ export function TestResultCard({
     <Card className="border-gray-200 shadow-sm">
       <CardHeader className="bg-gradient-to-r from-teal-600/5 to-transparent border-b pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <CardTitle className="text-base text-gray-800">{test.name}</CardTitle>
-          {result && <StatusBadge status={result.status} type="test" />}
+          <CardTitle className="text-base text-gray-800">
+            {test?.name}
+          </CardTitle>
+          {/* {result && <StatusBadge status={result?.status} type="test" />} */}
         </div>
-        <p className="text-sm text-gray-500 mt-1">{test.description}</p>
+        <p className="text-sm text-gray-500 mt-1">{test?.description}</p>
       </CardHeader>
       <CardContent className="pt-4">
-        {isAdmin && (!result || result.status !== "completed") ? (
+        {isAdmin && (!result?.result_value) ? (
           <Tabs defaultValue="form">
             <TabsList className="mb-4">
               <TabsTrigger value="form">Enter Results</TabsTrigger>
@@ -277,14 +276,14 @@ export function TestResultCard({
               </Form>
             </TabsContent>
           </Tabs>
-        ) : result?.status === "completed" ? (
+        ) : result?.result_value ? (
           <div className="space-y-4">
             {result.result_value && (
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Result</h3>
                 <p className="mt-1 text-sm whitespace-pre-line">
                   {result.result_value}
-                </p>
+                </p> 
               </div>
             )}
 

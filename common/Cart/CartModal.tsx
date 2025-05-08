@@ -45,7 +45,11 @@ import { toast } from "react-toastify";
 import { useCart } from "@/providers/CartProvider";
 import { fetchLabBranches } from "@/utils/supabase/lab-branches";
 import { useCurrentUser } from "@/providers/AuthProvider";
-import { createBooking, fetchLatestBookingIdForUser } from "@/utils/supabase/bookings";
+import {
+  createBooking,
+  fetchLatestBookingIdForUser,
+  insertTestsBooking,
+} from "@/utils/supabase/bookings";
 
 type CartModalProps = {
   open: boolean;
@@ -146,7 +150,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
           booking_id: bookingId,
           test_id: item.test.id,
         };
-        await import("@/utils/supabase/bookings").then(mod => mod.insertTestsBooking(testBookingPayload));
+        await insertTestsBooking(testBookingPayload);
       }
 
       // Clear cart and close modal

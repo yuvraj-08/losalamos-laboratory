@@ -1,3 +1,8 @@
+import { toast } from "react-toastify";
+import { createClient } from "./client";
+
+const supabase = createClient();
+
 // Fetch the most recent booking for a user (by created_at desc)
 export async function fetchLatestBookingIdForUser(user_id: string) {
   try {
@@ -18,10 +23,6 @@ export async function fetchLatestBookingIdForUser(user_id: string) {
     return null;
   }
 }
-import { toast } from "react-toastify";
-import { createClient } from "./client";
-
-const supabase = createClient();
 
 export async function createBooking(addBookingsPayload: any) {
   try {
@@ -49,7 +50,6 @@ export async function insertTestsBooking(addBookingsPayload: any) {
     if (error) {
       toast.error("Error inserting data into tests_bookings: " + error.message);
     }
-    toast.success("Your booking has been submitted successfully.");
     return data;
   } catch (err) {
     console.error("Error inserting data into bookings:", err);
@@ -57,3 +57,57 @@ export async function insertTestsBooking(addBookingsPayload: any) {
   }
 }
 
+export async function fetchUserBookings(bookingId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*, users(*), lab_branches(*)")
+      .eq("id", bookingId)
+      .order("created_at", { ascending: false })
+      .single();
+
+    if (error) {
+      toast.error("Error fetching bookings: " + error.message);
+    }
+    return data;
+  } catch (err) {
+    console.error("Error fetching bookings:", err);
+    toast.error("Failed to fetch bookings. Please try again.");
+  }
+}
+
+export async function fetchBookingTests(bookingId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("tests_bookings")
+      .select("*, test_id:tests(*)")
+      .eq("booking_id", bookingId)
+      .order("created_at", { ascending: false });
+
+    console.log("fetchBookingTests", data, error);
+    if (error) {
+      toast.error("Error fetching booking tests: " + error.message);
+    }
+    return data;
+  } catch (err) {
+    console.error("Error fetching booking tests:", err);
+    toast.error("Failed to fetch booking tests. Please try again.");
+  }
+}
+
+export async function updateResult(testId: string, data: any) {
+  try {
+    const { data: updatedData, error } = await supabase
+      .from("tests_bookings")
+      .update(data)
+      .eq("test_id", testId);
+
+    if (error) {
+      toast.error("Error updating test result: " + error.message);
+    }
+    return updatedData;
+  } catch (err) {
+    console.error("Error updating test result:", err);
+    toast.error("Failed to update test result. Please try again.");
+  }
+}
