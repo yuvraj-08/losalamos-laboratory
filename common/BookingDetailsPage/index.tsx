@@ -20,41 +20,29 @@ import type { TestResult } from "@/types";
 import { createClient } from "@/utils/supabase/client";
 import { useCurrentUser } from "@/providers/AuthProvider";
 
-// // In a real app, you would get the current user ID from authentication
-// const CURRENT_USER_ID = "user-001"
-
 export default function PatientBookingDetailsPage() {
   const router = useRouter();
-  const {appUser} = useCurrentUser();
+  const { appUser } = useCurrentUser();
   const [isLoading, setIsLoading] = useState(true);
-  const [testResults, setTestResults] = useState<TestResult[] | null>([]);
-
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
   const bookingId = useSearchParams().get("bookingId") || "";
   const [booking, setBooking] = useState<any>(null);
   const [lab, setLab] = useState<any>(null);
-  const patient = appUser;
-  const isUserBooking = booking?.user_id === appUser?.id;
+  const [patient, setPatient] = useState<any>(null);
 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
       const supabase = createClient();
       // Fetch booking details
-      const { data: bookingData, error: bookingError } = await supabase
+      const { data: bookingData } = await supabase
         .from("bookings")
-        .select("*, lab_branches(*)")
+        .select("*, lab_branches(*), user:users(*)")
         .eq("id", bookingId)
         .single();
       setBooking(bookingData);
-      // Fetch lab details if needed
-      if (bookingData?.lab) {
-        const { data: labData } = await supabase
-          .from("lab_branches")
-          .select("*")
-          .eq("id", bookingData.lab)
-          .single();
-        setLab(labData);
-      }
+      setLab(bookingData?.lab_branches || null);
+      setPatient(bookingData?.user || appUser || null);
       // Fetch test results
       const { data: testResultsData } = await supabase
         .from("test_results")
@@ -87,47 +75,9 @@ export default function PatientBookingDetailsPage() {
       return () => timeline.kill();
     }, 500);
     return () => clearTimeout(timer);
-  }, [bookingId]);
+  }, [bookingId, appUser]);
 
-  useEffect(() => {
-    // Fetch test results
-    // const results = getTestResultsForBooking(bookingId);
-    const results = null;
-    setTestResults(results);
-
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    // GSAP animations
-    const timeline = gsap.timeline({ delay: 0.5 });
-
-    timeline.fromTo(
-      ".page-header",
-      { opacity: 0, y: -20 },
-      { opacity: 1, y: 0, duration: 0.5 }
-    );
-
-    timeline.fromTo(
-      ".booking-info",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5 },
-      "-=0.3"
-    );
-
-    timeline.fromTo(
-      ".test-result-card",
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, stagger: 0.1, duration: 0.3 },
-      "-=0.2"
-    );
-
-    return () => {
-      clearTimeout(timer);
-      timeline.kill();
-    };
-  }, [bookingId]);
+  const isUserBooking = booking?.user_id === appUser?.id;
 
   if (isLoading) {
     return (
@@ -260,9 +210,10 @@ export default function PatientBookingDetailsPage() {
               testResults?.map((result) => (
                 <div key={result.id} className="test-result-card">
                   <TestResultCard
-                    test={result.test!}
+                    test={result.test as any}
                     result={result}
                     isAdmin={false}
+                    onResultUpdate={() => {}}
                   />
                 </div>
               ))

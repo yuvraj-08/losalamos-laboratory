@@ -323,80 +323,80 @@ export const mockBookings: Booking[] = [
   },
 ];
 
-export const mockTestResults: TestResult[] = [
-  {
-    id: "result-001",
-    booking_id: "booking-001",
-    test_id: "test-001",
-    result_value:
-      "Normal range. RBC: 4.8 million/μL, WBC: 7,500/μL, Platelets: 250,000/μL",
-    remarks: "All values within normal range",
-    linkToReport: "/reports/cbc-report-001.pdf",
-    performed_at: "2023-11-16T14:30:00",
-    status: "completed",
-  },
-  {
-    id: "result-002",
-    booking_id: "booking-001",
-    test_id: "test-002",
-    result_value:
-      "Total Cholesterol: 185 mg/dL, HDL: 55 mg/dL, LDL: 110 mg/dL, Triglycerides: 100 mg/dL",
-    remarks: "Cholesterol levels are within acceptable range",
-    linkToReport: "/reports/lipid-report-001.pdf",
-    performed_at: "2023-11-16T15:00:00",
-    status: "completed",
-  },
-  {
-    id: "result-003",
-    booking_id: "booking-002",
-    test_id: "test-005",
-    result_value: null,
-    remarks: null,
-    linkToReport: null,
-    performed_at: null,
-    status: "pending",
-  },
-  {
-    id: "result-004",
-    booking_id: "booking-003",
-    test_id: "test-003",
-    result_value: "TSH: 2.5 mIU/L, T3: 120 ng/dL, T4: 8.5 μg/dL",
-    remarks: "Thyroid function normal",
-    linkToReport: "/reports/thyroid-report-001.pdf",
-    performed_at: "2023-10-21T10:15:00",
-    status: "completed",
-  },
-  {
-    id: "result-005",
-    booking_id: "booking-003",
-    test_id: "test-004",
-    result_value: "ALT: 25 U/L, AST: 28 U/L, ALP: 70 U/L, Bilirubin: 0.8 mg/dL",
-    remarks: "Liver function normal",
-    linkToReport: "/reports/liver-report-001.pdf",
-    performed_at: "2023-10-21T10:45:00",
-    status: "completed",
-  },
-  {
-    id: "result-006",
-    booking_id: "booking-005",
-    test_id: "test-001",
-    result_value: null,
-    remarks: null,
-    linkToReport: null,
-    performed_at: null,
-    status: "in-progress",
-  },
-  {
-    id: "result-007",
-    booking_id: "booking-005",
-    test_id: "test-004",
-    result_value: null,
-    remarks: null,
-    linkToReport: null,
-    performed_at: null,
-    status: "pending",
-  },
-];
+// export const mockTestResults: TestResult[] = [
+//   {
+//     id: "result-001",
+//     booking_id: "booking-001",
+//     test_id: "test-001",
+//     result_value:
+//       "Normal range. RBC: 4.8 million/μL, WBC: 7,500/μL, Platelets: 250,000/μL",
+//     remarks: "All values within normal range",
+//     linkToReport: "/reports/cbc-report-001.pdf",
+//     performed_at: "2023-11-16T14:30:00",
+//     status: "completed",
+//   },
+//   {
+//     id: "result-002",
+//     booking_id: "booking-001",
+//     test_id: "test-002",
+//     result_value:
+//       "Total Cholesterol: 185 mg/dL, HDL: 55 mg/dL, LDL: 110 mg/dL, Triglycerides: 100 mg/dL",
+//     remarks: "Cholesterol levels are within acceptable range",
+//     linkToReport: "/reports/lipid-report-001.pdf",
+//     performed_at: "2023-11-16T15:00:00",
+//     status: "completed",
+//   },
+//   {
+//     id: "result-003",
+//     booking_id: "booking-002",
+//     test_id: "test-005",
+//     result_value: null,
+//     remarks: null,
+//     linkToReport: null,
+//     performed_at: null,
+//     status: "pending",
+//   },
+//   {
+//     id: "result-004",
+//     booking_id: "booking-003",
+//     test_id: "test-003",
+//     result_value: "TSH: 2.5 mIU/L, T3: 120 ng/dL, T4: 8.5 μg/dL",
+//     remarks: "Thyroid function normal",
+//     linkToReport: "/reports/thyroid-report-001.pdf",
+//     performed_at: "2023-10-21T10:15:00",
+//     status: "completed",
+//   },
+//   {
+//     id: "result-005",
+//     booking_id: "booking-003",
+//     test_id: "test-004",
+//     result_value: "ALT: 25 U/L, AST: 28 U/L, ALP: 70 U/L, Bilirubin: 0.8 mg/dL",
+//     remarks: "Liver function normal",
+//     linkToReport: "/reports/liver-report-001.pdf",
+//     performed_at: "2023-10-21T10:45:00",
+//     status: "completed",
+//   },
+//   {
+//     id: "result-006",
+//     booking_id: "booking-005",
+//     test_id: "test-001",
+//     result_value: null,
+//     remarks: null,
+//     linkToReport: null,
+//     performed_at: null,
+//     status: "in-progress",
+//   },
+//   {
+//     id: "result-007",
+//     booking_id: "booking-005",
+//     test_id: "test-004",
+//     result_value: null,
+//     remarks: null,
+//     linkToReport: null,
+//     performed_at: null,
+//     status: "pending",
+//   },
+// ];
 
 // Helper function to get a patient's bookings
 export const getPatientBookings = (patientId: string): Booking[] => {
@@ -404,18 +404,18 @@ export const getPatientBookings = (patientId: string): Booking[] => {
 };
 
 // Helper function to get booking details with lab info
-export const getBookingWithDetails = (
-  bookingId: string
-): Booking | undefined => {
-  const booking = mockBookings.find((b) => b.id === bookingId);
-  if (!booking) return undefined;
+// export const getBookingWithDetails = (
+//   bookingId: string
+// ): Booking | undefined => {
+//   const booking = mockBookings.find((b) => b.id === bookingId);
+//   if (!booking) return undefined;
 
-  const lab = mockLabs.find((l) => l.id === booking.lab);
-  return {
-    ...booking,
-    lab_details: lab,
-  };
-};
+//   const lab = mockLabs.find((l) => l.id === booking.lab);
+//   return {
+//     ...booking,
+//     lab_details: lab,
+//   };
+// };
 
 // // Helper function to get test results for a booking
 // export const getTestResultsForBooking = (bookingId: string): TestResult[] => {

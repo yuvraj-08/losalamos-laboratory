@@ -2,33 +2,45 @@
 
 import { useEffect, useState } from "react";
 import { gsap } from "gsap";
+import { createClient } from "@/utils/supabase/client";
+import { useCurrentUser } from "@/providers/AuthProvider";
 
-import {
-  getBookingWithDetails,
-  getPatientBookings,
-  getPatientById,
-} from "@/data/mock-data";
-import { PatientInfoCard } from "@/components/patient-info-card";
 import { BookingList } from "@/components/booking-list";
-
-// In a real app, you would get the current user ID from authentication
-const CURRENT_USER_ID = "user-001";
 
 export default function PatientBookingsPage() {
   const [isLoading, setIsLoading] = useState(true);
-
-  const patient = getPatientById(CURRENT_USER_ID);
-  const bookings = getPatientBookings(CURRENT_USER_ID).map((booking) => {
-    const bookingWithDetails = getBookingWithDetails(booking.id);
-    return bookingWithDetails || booking;
-  });
+  const { appUser } = useCurrentUser();
+  const [patient, setPatient] = useState<any>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate data loading
-    const timer = setTimeout(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      if (!appUser?.id) {
+        setIsLoading(false);
+        return;
+      }
+      const supabase = createClient();
+      // Fetch patient info
+      const { data: patientData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", appUser.id)
+        .single();
+      setPatient(patientData);
+      // Fetch bookings for patient
+      const { data: bookingsData } = await supabase
+        .from("bookings")
+        .select("*, lab_branches(*), test_results(*, test:tests(*))")
+        .eq("user_id", appUser.id)
+        .order("date", { ascending: false });
+      setBookings(bookingsData || []);
       setIsLoading(false);
-    }, 500);
+    }
+    fetchData();
+  }, [appUser]);
 
+  useEffect(() => {
     // GSAP animations
     const timeline = gsap.timeline({ delay: 0.5 });
 
@@ -53,7 +65,6 @@ export default function PatientBookingsPage() {
     );
 
     return () => {
-      clearTimeout(timer);
       timeline.kill();
     };
   }, []);
