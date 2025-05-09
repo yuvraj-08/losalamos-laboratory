@@ -20,11 +20,16 @@ export const handleSignUpAction = async (data: IFormValues) => {
     return;
   }
 
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://losalamos-laboratory.vercel.app";
+
   const { error, data: userDataSupa } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : "losalamos-laboratory.vercel.app"}/auth/callback`,
+      emailRedirectTo: `${baseUrl}/auth/callback`,
     },
   });
 
@@ -56,8 +61,5 @@ export const handleSignUpAction = async (data: IFormValues) => {
     toast.error(userError?.message || "Failed to save user data");
     return;
   }
-  toast.success(
-    "Please check your email for a verification link."
-  );
-
+  toast.success("Please check your email for a verification link.");
 };
