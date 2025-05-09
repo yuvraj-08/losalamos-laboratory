@@ -20,10 +20,7 @@ export const handleSignUpAction = async (data: IFormValues) => {
     return;
   }
 
-  const baseUrl =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "https://losalamos-laboratory.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const { error, data: userDataSupa } = await supabase.auth.signUp({
     email,

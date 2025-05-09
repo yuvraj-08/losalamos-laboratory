@@ -31,7 +31,7 @@ export default function PatientBookingsPage() {
       // Fetch bookings for patient
       const { data: bookingsData } = await supabase
         .from("bookings")
-        .select("*, lab_branches(*), test_results(*, test:tests(*))")
+        .select("*, lab_branches(*)")
         .eq("user_id", appUser.id)
         .order("date", { ascending: false });
       setBookings(bookingsData || []);

@@ -113,7 +113,7 @@ export default function Dashboard() {
               text="Patients"
               active={activeTab === "patients"}
               onClick={() => {
-                router.replace("/dashboard?tab=patients");
+                router.push("/dashboard?tab=patients");
                 setActiveTab("patients");
                 isMobile && setSidebarOpen(false);
               }}
@@ -126,7 +126,7 @@ export default function Dashboard() {
               text="Tests"
               active={activeTab === "tests"}
               onClick={() => {
-                router.replace("/dashboard?tab=tests");
+                router.push("/dashboard?tab=tests");
                 setActiveTab("tests");
                 isMobile && setSidebarOpen(false);
               }}
@@ -139,7 +139,7 @@ export default function Dashboard() {
               text="Test Categories"
               active={activeTab === "test-categories"}
               onClick={() => {
-                router.replace("/dashboard?tab=test-categories");
+                router.push("/dashboard?tab=test-categories");
                 setActiveTab("test-categories");
                 isMobile && setSidebarOpen(false);
               }}
@@ -152,7 +152,7 @@ export default function Dashboard() {
               text="Lab Branches"
               active={activeTab === "lab-branches"}
               onClick={() => {
-                router.replace("/dashboard?tab=lab-branches");
+                router.push("/dashboard?tab=lab-branches");
                 setActiveTab("lab-branches");
                 isMobile && setSidebarOpen(false);
               }}
@@ -165,7 +165,7 @@ export default function Dashboard() {
               text="My Bookings"
               active={activeTab === "bookings"}
               onClick={() => {
-                router.replace("/dashboard?tab=bookings");
+                router.push("/dashboard?tab=bookings");
                 setActiveTab("bookings");
                 isMobile && setSidebarOpen(false);
               }}
@@ -184,7 +184,7 @@ export default function Dashboard() {
             text="Profile"
             active={activeTab === "profile"}
             onClick={() => {
-              router.replace("/dashboard?tab=profile");
+              router.push("/dashboard?tab=profile");
               setActiveTab("profile");
               isMobile && setSidebarOpen(false);
             }}

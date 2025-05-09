@@ -120,7 +120,7 @@ export default function PatientDetailsPageForAdmin() {
           variant="ghost"
           size="sm"
           className="mr-4"
-          onClick={() => router.replace("/dashboard?tab=patients")}
+          onClick={() => router.push("/dashboard?tab=patients")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back

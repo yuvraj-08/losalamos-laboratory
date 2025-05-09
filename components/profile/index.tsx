@@ -139,7 +139,7 @@ export default function ProfilePage() {
           });
         }
 
-        router.replace("/dashboard?tab=patients");
+        router.push("/dashboard?tab=patients");
       })
       .finally(() => {
         setIsLoading(false);

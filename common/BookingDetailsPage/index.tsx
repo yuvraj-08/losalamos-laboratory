@@ -37,17 +37,20 @@ export default function PatientBookingDetailsPage() {
       // Fetch booking details
       const { data: bookingData } = await supabase
         .from("bookings")
-        .select("*, lab_branches(*), user:users(*)")
+        .select("*, lab_branches(*), user_id:users(*)")
         .eq("id", bookingId)
         .single();
+      console.log("bookingData", bookingData);
       setBooking(bookingData);
       setLab(bookingData?.lab_branches || null);
       setPatient(bookingData?.user || appUser || null);
       // Fetch test results
       const { data: testResultsData } = await supabase
-        .from("test_results")
-        .select("*, test:tests(*)")
+        .from("tests_bookings")
+        .select("*, test_id:tests(*)")
         .eq("booking_id", bookingId);
+
+      console.log("testResultsData", testResultsData);
       setTestResults(testResultsData || []);
       setIsLoading(false);
     }
@@ -77,8 +80,6 @@ export default function PatientBookingDetailsPage() {
     return () => clearTimeout(timer);
   }, [bookingId, appUser]);
 
-  const isUserBooking = booking?.user_id === appUser?.id;
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
@@ -86,7 +87,7 @@ export default function PatientBookingDetailsPage() {
       </div>
     );
   }
-  if (!booking || !patient || !isUserBooking) {
+  if (!booking) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-12">
@@ -117,7 +118,7 @@ export default function PatientBookingDetailsPage() {
           variant="ghost"
           size="sm"
           className="mr-4"
-          onClick={() => router.push("/patient/bookings")}
+          onClick={() => router.push("/dashboard?tab=bookings")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to My Bookings
@@ -210,7 +211,7 @@ export default function PatientBookingDetailsPage() {
               testResults?.map((result) => (
                 <div key={result.id} className="test-result-card">
                   <TestResultCard
-                    test={result.test as any}
+                    test={result.test_id}
                     result={result}
                     isAdmin={false}
                     onResultUpdate={() => {}}
