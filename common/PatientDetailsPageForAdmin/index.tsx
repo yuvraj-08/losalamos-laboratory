@@ -93,7 +93,7 @@ export default function PatientDetailsPageForAdmin() {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => router.back()}
+            onClick={() => router.push("/dashboard?tab=patients")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back

@@ -17,6 +17,7 @@ import {
   UserCircle,
   LogOut,
   Home,
+  BookMarked,
 } from "lucide-react";
 import { TestCategoriesList } from "@/components/test-categories/test-categories-list";
 import { LabBranchesList } from "@/components/lab-branches/lab-branches-list";
@@ -161,7 +162,7 @@ export default function Dashboard() {
           )}
           {appUser?.role === "user" && (
             <SidebarItem
-              icon={<MapPin size={20} />}
+              icon={<BookMarked  size={20} />}
               text="My Bookings"
               active={activeTab === "bookings"}
               onClick={() => {

@@ -42,9 +42,9 @@ export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const verified = searchParams.get("verified");
-
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   const { setSession, setUser } = useCurrentUser();
-  
+
   useEffect(() => {
     if (verified === "true") {
       toast.success("Account verified successfully");
@@ -87,7 +87,7 @@ export default function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      router.push("/dashboard");
+      router.push(redirectTo);
     } catch (err: any) {
       console.error("Sign in error:", err);
       toast.error(`Sign in failed: ${err.message || "Unknown error"}`);
@@ -215,7 +215,7 @@ export default function SignInForm() {
                   {isSubmitting ? "Signing in..." : "Log in"}
                 </Button>
 
-                <div className="relative">
+                {/* <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t"></span>
                   </div>
@@ -224,8 +224,8 @@ export default function SignInForm() {
                       Or continue with
                     </span>
                   </div>
-                </div>
-
+                </div> */}
+                {/* 
                 <div className="grid grid-cols-2 gap-4">
                   <Button variant="outline" type="button">
                     Google
@@ -233,7 +233,7 @@ export default function SignInForm() {
                   <Button variant="outline" type="button">
                     GitHub
                   </Button>
-                </div>
+                </div> */}
               </div>
             </form>
           </Form>

@@ -113,7 +113,7 @@ export default function PatientBookingDetailsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center mb-6 page-header">
+      <div className="flex items-center mb-6 page-header max-sm:flex-col">
         <Button
           variant="ghost"
           size="sm"
@@ -123,10 +123,12 @@ export default function PatientBookingDetailsPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to My Bookings
         </Button>
-        <div className="w-1 h-6 bg-teal-600 mr-3"></div>
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Booking Details
-        </h1>
+        <div className="flex">
+          <div className="w-1 h-6 bg-teal-600 mr-3"></div>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Booking Details
+          </h1>
+        </div>
       </div>
 
       <div className="grid gap-6">

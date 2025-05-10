@@ -63,6 +63,7 @@ export function CreateLabBranchForm({ onSuccess }: CreateLabBranchFormProps) {
     setIsSubmitting(true);
     insertLabBranch(data)
       .then(() => {
+        onSuccess?.();
         form.reset();
         setOpen(false);
       })

@@ -227,8 +227,9 @@ export default function TestDetailsPage({
               </div>
 
               <Button
-                className={`add-to-cart-btn w-full ${isTestInCart ? "bg-teal-700" : "bg-teal-600"} hover:bg-teal-700 text-white`}
+                className={`add-to-cart-btn w-full ${isTestInCart ? "bg-teal-400" : "bg-teal-600"} hover:bg-teal-700 text-white`}
                 onClick={handleAddToCart}
+                disabled={isTestInCart}
               >
                 {isTestInCart ? (
                   <>

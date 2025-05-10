@@ -2,15 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { gsap } from "gsap";
-import { CalendarIcon, Save, User } from "lucide-react";
-import { format } from "date-fns";
+import { Save, User } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -30,11 +27,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -42,10 +34,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "react-toastify";
 import { useCurrentUser } from "@/providers/AuthProvider";
 import { updateCurrentUserProfile } from "@/utils/supabase/users";
 import { useRouter } from "next/navigation";
+import { CustomDatePicker } from "@/common/CustomDatePicker";
 
 const formSchema = z.object({
   first_name: z.string().min(2, {
@@ -119,7 +111,7 @@ export default function ProfilePage() {
     const { date_of_birth, ...restValues } = values;
     const userData = {
       ...restValues,
-      date_of_birth: date_of_birth.toISOString(),
+      date_of_birth,
       id: appUser?.id,
     };
     updateCurrentUserProfile(userData)
@@ -138,8 +130,9 @@ export default function ProfilePage() {
             },
           });
         }
-
-        router.push("/dashboard?tab=patients");
+        appUser?.role === "admin"
+          ? router.push("/dashboard?tab=patients")
+          : router.push("/dashboard?tab=bookings");
       })
       .finally(() => {
         setIsLoading(false);
@@ -251,48 +244,19 @@ export default function ProfilePage() {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="date_of_birth"
-                  render={({ field }) => (
-                    <FormItem className="form-field">
-                      <FormLabel>Date of Birth</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="form-field">
+                  <Controller
+                    control={form.control}
+                    name="date_of_birth"
+                    render={({ field }) => (
+                      <CustomDatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="Date of Birth"
+                      />
+                    )}
+                  />
+                </div>
               </div>
 
               <FormField

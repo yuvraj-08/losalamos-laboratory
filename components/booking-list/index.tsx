@@ -64,9 +64,9 @@ export function BookingList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Booking ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Lab</TableHead>
+                <TableHead className="!min-w-[150px]">Booking ID</TableHead>
+                <TableHead className="!min-w-[115px]">Date</TableHead>
+                <TableHead className="!min-w-[250px]">Lab</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead className="text-right">Actions</TableHead>

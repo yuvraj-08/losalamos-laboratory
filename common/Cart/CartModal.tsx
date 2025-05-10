@@ -5,14 +5,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { format } from "date-fns";
-import {
-  CalendarIcon,
-  Minus,
-  Plus,
-  ShoppingCart,
-  Trash2,
-  X,
-} from "lucide-react";
+import { CalendarIcon, ShoppingCart, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -50,6 +43,7 @@ import {
   fetchLatestBookingIdForUser,
   insertTestsBooking,
 } from "@/utils/supabase/bookings";
+import { useRouter } from "next/navigation";
 
 type CartModalProps = {
   open: boolean;
@@ -58,7 +52,7 @@ type CartModalProps = {
 
 export function CartModal({ open, onOpenChange }: CartModalProps) {
   const { appUser } = useCurrentUser();
-  const { items, removeItem, addItem, getTotalPrice, clearCart } = useCart();
+  const { items, removeItem, getTotalPrice, clearCart } = useCart();
   const [step, setStep] = useState<"cart" | "booking">("cart");
   const [bookingData, setBookingData] = useState<BookingFormData>({
     date: new Date(),
@@ -66,7 +60,8 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
     collection_location: "lab",
   });
   const [labs, setLabs] = useState<any[]>([]);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     const fetchLabs = async () => {
       fetchLabBranches().then((labs) => {
@@ -84,6 +79,13 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
   const handleNextStep = () => {
     if (items.length === 0) {
       toast.error("Please add some tests to your cart before proceeding.");
+      return;
+    }
+
+    if (!appUser?.id) {
+      toast.error("User not found. Please sign in again.");
+      router.push("/sign-in?redirect=/tests?login=true");
+      onOpenChange(false);
       return;
     }
 
@@ -110,14 +112,16 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsSubmitting(true);
     // Validate form
     if (!bookingData.date) {
+      setIsSubmitting(false);
       toast.error("Please select a date for your booking.");
       return;
     }
 
     if (!bookingData.lab) {
+      setIsSubmitting(false);
       toast.error("Please select a lab for your booking.");
       return;
     }
@@ -131,16 +135,21 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
     };
 
     try {
-      await createBooking(addBookingsPayload);
-      // Fetch the latest booking id for this user
-
       if (!appUser?.id) {
         toast.error("User not found. Please sign in again.");
+        router.push("/sign-in?redirect=/tests?login=true");
+        onOpenChange(false);
+        setIsSubmitting(false);
         return;
       }
+
+      await createBooking(addBookingsPayload);
+
+      // Fetch the latest booking id for this user
       const bookingId = await fetchLatestBookingIdForUser(appUser.id);
       if (!bookingId) {
         toast.error("Failed to get booking ID after creation.");
+        setIsSubmitting(false);
         return;
       }
 
@@ -154,14 +163,18 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
       }
 
       // Clear cart and close modal
+      setIsSubmitting(false);
       clearCart();
       setStep("cart");
-      toast.success("Your booking has been submitted successfully.");
       onOpenChange(false);
+      toast.success("Your booking has been submitted successfully.");
     } catch (error) {
       console.error("Error creating booking or test bookings:", error);
       toast.error("Failed to create booking. Please try again.");
+      setIsSubmitting(false);
       onOpenChange(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -410,9 +423,10 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
               </Button>
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="bg-teal-600 hover:bg-teal-700 text-white"
               >
-                Complete Booking
+               {isSubmitting ? "Booking..." : "Complete Booking"}
               </Button>
             </DialogFooter>
           </form>

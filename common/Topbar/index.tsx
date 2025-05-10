@@ -14,7 +14,7 @@ const Topbar = () => {
             </div>
             <div className="flex items-center">
               <Mail className="h-3 w-3 mr-1" />
-              <span>LosAlamos@email.com</span>
+              <span>losalamos-admin@yopmail.com</span>
             </div>
           </div>
           <div className="flex items-center space-x-4">
