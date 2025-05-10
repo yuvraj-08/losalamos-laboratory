@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useCurrentUser } from "@/providers/AuthProvider";
 
 import { BookingList } from "@/components/booking-list";
+import { Loader } from "lucide-react";
 
 export default function PatientBookingsPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +42,7 @@ export default function PatientBookingsPage() {
   }, [appUser]);
 
   useEffect(() => {
+    if (isLoading || !patient) return;
     // GSAP animations
     const timeline = gsap.timeline({ delay: 0.5 });
 
@@ -67,18 +69,13 @@ export default function PatientBookingsPage() {
     return () => {
       timeline.kill();
     };
-  }, []);
+  }, [patient, isLoading]);
 
-  if (!patient) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            User not found
-          </h2>
-          <p className="mt-2 text-gray-500">
-            Please log in to view your bookings.
-          </p>
+        <div className="flex justify-center py-12">
+          <Loader className="animate-spin" />
         </div>
       </div>
     );
@@ -86,12 +83,12 @@ export default function PatientBookingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center mb-6 page-header">
+      <div className="flex items-center mb-6 page-header opacity-0 -translate-y-5">
         <div className="w-1 h-6 bg-teal-600 mr-3"></div>
         <h1 className="text-2xl font-semibold text-gray-800">My Bookings</h1>
       </div>
 
-      <div className="bookings-list">
+      <div className="bookings-list  opacity-0 translate-y-5">
         <BookingList bookings={bookings} />
       </div>
     </div>

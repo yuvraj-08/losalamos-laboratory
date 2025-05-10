@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Loader } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -11,35 +11,6 @@ import {
   fetchTestsAndCategories,
 } from "@/utils/supabase/tests&categories";
 
-// // TODO: Replace with Supabase fetch logic
-// const mockTestCategories = [
-//   {
-//     category: "Blood Tests",
-//     tests: ["CBC", "Blood Sugar", "Cholesterol", "Liver Function"],
-//   },
-//   {
-//     category: "Imaging Tests",
-//     tests: ["X-Ray", "MRI", "CT Scan", "Ultrasound"],
-//   },
-//   {
-//     category: "Cardiac Tests",
-//     tests: ["ECG", "Stress Test", "Echocardiogram", "Holter Monitor"],
-//   },
-//   {
-//     category: "Urine Tests",
-//     tests: ["Urinalysis", "Urine Culture", "Protein Test", "Glucose Test"],
-//   },
-//   {
-//     category: "Genetic Tests",
-//     tests: [
-//       "DNA Testing",
-//       "Chromosome Analysis",
-//       "Carrier Testing",
-//       "Prenatal Testing",
-//     ],
-//   },
-// ];
-
 export const TestCategoriesDropdown = ({
   mobile = false,
   onTestClick,
@@ -47,9 +18,10 @@ export const TestCategoriesDropdown = ({
   mobile?: boolean;
   onTestClick?: () => void;
 }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // Replace with Supabase fetch in useEffect if needed
   const [testCategories, setTestCategories] = useState<GroupedTestCategory[]>(
     []
@@ -156,14 +128,10 @@ export const TestCategoriesDropdown = ({
       );
 
       setTestCategories(formatted);
+      setLoading(false);
     };
 
     fetchTests();
-  }, []);
-
-  useEffect(() => {
-    fetchPopularTests();
-    fetchTestsAndCategories();
   }, []);
 
   // Mobile: always open, no button.
@@ -213,41 +181,51 @@ export const TestCategoriesDropdown = ({
         ref={dropdownRef}
         className="absolute -right-40 top-8 bg-white shadow-lg rounded-md mt-2 py-6 px-6 w-[600px] z-40 border border-gray-100"
       >
-        <div className="flex justify-between items-start">
-          <div className="grid grid-cols-3 gap-8 w-full">
-            {testCategories.slice(0, 3).map((category, idx) => (
-              <div key={idx} className="mb-4">
-                <p className="font-semibold text-emerald-700 border-b border-gray-100 pb-1 mb-2">
-                  {category.category}
-                </p>
-                <ul className="space-y-2">
-                  {category.tests.map((test, index) => (
-                    <li key={index}>
-                      <Link
-                        href={`/tests/${test.id}`}
-                        className="block text-gray-600 hover:text-emerald-600 hover:translate-x-1 text-sm py-1 cursor-pointer transition-all duration-200"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        {test.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        {loading && (
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center py-12">
+              <Loader className="animate-spin" />
+            </div>
           </div>
-          <div
-            className="ml-6 mt-2 border-l pl-6 h-full"
-            onClick={() => setIsDropdownOpen(false)}
-          >
-            <Link
-              href="/tests"
-              className="flex items-center text-emerald-600 hover:text-emerald-700 font-medium text-sm whitespace-nowrap transition-colors duration-200"
+        )}
+
+        {!loading && (
+          <div className="flex justify-between items-start">
+            <div className="grid grid-cols-3 gap-8 w-full">
+              {testCategories.slice(0, 3).map((category, idx) => (
+                <div key={idx} className="mb-4">
+                  <p className="font-semibold text-emerald-700 border-b border-gray-100 pb-1 mb-2">
+                    {category.category}
+                  </p>
+                  <ul className="space-y-2">
+                    {category.tests.map((test, index) => (
+                      <li key={index}>
+                        <Link
+                          href={`/tests/${test.id}`}
+                          className="block text-gray-600 hover:text-emerald-600 hover:translate-x-1 text-sm py-1 cursor-pointer transition-all duration-200"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          {test.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div
+              className="ml-6 mt-2 border-l pl-6 h-full"
+              onClick={() => setIsDropdownOpen(false)}
             >
-              View All Tests <ChevronRight className="h-4 w-4 ml-1" />
-            </Link>
+              <Link
+                href="/tests"
+                className="flex items-center text-emerald-600 hover:text-emerald-700 font-medium text-sm whitespace-nowrap transition-colors duration-200"
+              >
+                View All Tests <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

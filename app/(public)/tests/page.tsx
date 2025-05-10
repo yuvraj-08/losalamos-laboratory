@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Search } from "lucide-react";
+import { Loader, Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { fetchTestCategories, fetchTestsAndCategories, fetchPopularTests } from "@/utils/supabase/tests&categories";
+import {
+  fetchTestCategories,
+  fetchTestsAndCategories,
+  fetchPopularTests,
+} from "@/utils/supabase/tests&categories";
 import type { Test, TestCategory } from "@/types";
 import { TestCard } from "@/components/TestCard";
 
@@ -108,11 +112,12 @@ export default function TestsPage() {
     // Filter from allTests
     return allTests.filter((test) => {
       const matchesSearch = searchQuery
-        ? (test.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            test.description?.toLowerCase().includes(searchQuery.toLowerCase()))
+        ? test.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          test.description?.toLowerCase().includes(searchQuery.toLowerCase())
         : true;
       const matchesCategory = activeCategory
-        ? (test.test_category?.id === activeCategory || test.category === activeCategory)
+        ? test.test_category?.id === activeCategory ||
+          test.category === activeCategory
         : true;
       return matchesSearch && matchesCategory;
     });
@@ -120,6 +125,16 @@ export default function TestsPage() {
 
   const filteredTests = getFilteredTests();
   const categoriesWithTests = getCategoriesWithTests();
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center py-12">
+          <Loader className="animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

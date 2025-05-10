@@ -152,8 +152,9 @@ export function TestCard({ test, variant = "default" }: TestCardProps) {
             <Link href={`/tests/${test.id}`}>View Details</Link>
           </Button>
           <Button
-            className={`add-to-cart-btn flex-1 sm:flex-initial ${alreadyInCart ? "bg-teal-700" : "bg-teal-600"} hover:bg-teal-700 text-white`}
+            className={`add-to-cart-btn flex-1 sm:flex-initial ${alreadyInCart ? "bg-teal-400" : "bg-teal-600"} hover:bg-teal-700 text-white`}
             onClick={handleAddToCart}
+            disabled={alreadyInCart}
           >
             {alreadyInCart ? (
               <>

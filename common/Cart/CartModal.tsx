@@ -239,25 +239,6 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                         </div>
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => removeItem(item.test.id)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-6 text-center">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => addItem(item.test)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                          <Button
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"

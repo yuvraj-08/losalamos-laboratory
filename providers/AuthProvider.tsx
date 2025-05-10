@@ -5,6 +5,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { usePathname } from "next/navigation";
 import { IExtendedUser } from "@/types";
+import Loader from "@/app/loading";
 
 interface AuthContextType {
   user: User | null; // Supabase auth user
@@ -105,11 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
+    return <Loader/>;
   }
 
   return (
