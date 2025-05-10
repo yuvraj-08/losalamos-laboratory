@@ -87,6 +87,7 @@ export default function SignUpForm() {
     handleSignUpAction(values)
       .then(() => {
         form.reset();
+        setIsSubmitting(false);
         router.push("/sign-in");
       })
       .finally(() => {

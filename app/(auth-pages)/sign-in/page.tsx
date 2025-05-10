@@ -23,6 +23,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { signInAction } from "@/app/actions";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { useCurrentUser } from "@/providers/AuthProvider";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -40,6 +42,8 @@ export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const verified = searchParams.get("verified");
+
+  const { setSession, setUser } = useCurrentUser();
   
   useEffect(() => {
     if (verified === "true") {
@@ -56,26 +60,41 @@ export default function SignInForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     setError(null);
+
     const formData = new FormData();
     formData.append("email", values.email);
     formData.append("password", values.password);
     formData.append("rememberMe", String(values.rememberMe ?? false));
-    signInAction(formData)
-      .then(() => {
-        toast.success("Signed in successfully");
-        // Redirect to the dashboard or another page
-        router.push("/dashboard");
-      })
-      .catch((err) => {
-        toast.error(`Sign in failed due to : ${err}`);
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  }
+
+    try {
+      await signInAction(formData); // ✅ Server-side login
+
+      // 🔥 Now re-fetch session client-side
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.getSession();
+
+      console.log("Session data:", data);
+
+      const sessionUser = data.session?.user ?? null;
+      setSession(data.session);
+      setUser(sessionUser);
+
+      if (error || !data.session) {
+        throw new Error("Client session not set after sign-in");
+      }
+
+      toast.success("Signed in successfully");
+      router.push("/dashboard");
+    } catch (err: any) {
+      console.error("Sign in error:", err);
+      toast.error(`Sign in failed: ${err.message || "Unknown error"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row w-full">

@@ -38,7 +38,10 @@ export default function PatientBookingsPage() {
       setBookings(bookingsData || []);
       setIsLoading(false);
     }
-    fetchData();
+
+    if (appUser?.id) {
+      fetchData();
+    }
   }, [appUser]);
 
   useEffect(() => {
