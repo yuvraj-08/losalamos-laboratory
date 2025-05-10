@@ -111,7 +111,7 @@ export default function ProfilePage() {
     const { date_of_birth, ...restValues } = values;
     const userData = {
       ...restValues,
-      date_of_birth,
+      date_of_birth: date_of_birth.toISOString(),
       id: appUser?.id,
     };
     updateCurrentUserProfile(userData)
