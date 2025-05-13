@@ -92,8 +92,8 @@ const Navbar = () => {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
-      toast.success("Logged out successfully");
       router.push("/sign-in");
+      toast.success("Logged out successfully");
     } catch (error: any) {
       toast.error("Error logging out: " + error.message);
     }

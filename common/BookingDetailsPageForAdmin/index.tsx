@@ -69,7 +69,9 @@ export default function BookingDetailsPageForAdmin() {
 
       setIsLoading(false);
     }
-    fetchData();
+    if (bookingId) {
+      fetchData();
+    }
 
     // GSAP animations
     const timeline = gsap.timeline({ delay: 0.5 });
@@ -128,7 +130,11 @@ export default function BookingDetailsPageForAdmin() {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => router.push("/dashboard?tab=patient")}
+            onClick={() =>
+              router.push(
+                `/dashboard?tab=patientBookings&patientId=${patient.id}`
+              )
+            }
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
@@ -145,7 +151,11 @@ export default function BookingDetailsPageForAdmin() {
           variant="ghost"
           size="sm"
           className="mr-4"
-          onClick={() => router.push("/dashboard?tab=patient")}
+          onClick={() =>
+            router.push(
+              `/dashboard?tab=patientBookings&patientId=${patient.id}`
+            )
+          }
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Patient

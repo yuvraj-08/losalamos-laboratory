@@ -84,7 +84,6 @@ export async function fetchBookingTests(bookingId: string) {
       .eq("booking_id", bookingId)
       .order("created_at", { ascending: false });
 
-    console.log("fetchBookingTests", data, error);
     if (error) {
       toast.error("Error fetching booking tests: " + error.message);
     }
