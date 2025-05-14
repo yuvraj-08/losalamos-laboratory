@@ -28,19 +28,19 @@ export default function PatientDetailsPageForAdmin() {
     if (data) {
       setPatient(data);
     }
-    setIsLoading(false);
   };
   const fetchBookings = async () => {
     const data = await fetchAllBookings(patientId);
     if (data) {
       setBookings(data);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
     if (patientId) {
-      fetchPatient();
+      fetchPatient().finally(() => {
+        setIsLoading(false);
+      });
       fetchBookings();
     }
   }, [patientId]);
@@ -80,6 +80,16 @@ export default function PatientDetailsPageForAdmin() {
     };
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <h2 className="text-2xl text-gray-800">Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
   if (!patient) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -98,16 +108,6 @@ export default function PatientDetailsPageForAdmin() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
           </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold text-gray-800">Loading...</h2>
         </div>
       </div>
     );

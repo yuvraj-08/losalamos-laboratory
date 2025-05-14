@@ -26,6 +26,7 @@ import {
   fetchBookingTests,
   fetchUserBookings,
 } from "@/utils/supabase/bookings";
+import { BookingCardHeader } from "./BookingDetailsCardHeader";
 
 export default function BookingDetailsPageForAdmin() {
   const router = useRouter();
@@ -168,18 +169,7 @@ export default function BookingDetailsPageForAdmin() {
 
       <div className="grid gap-6">
         <Card className="booking-info border-gray-200 shadow-sm">
-          <CardHeader className="bg-gradient-to-r from-teal-600/10 to-teal-600/5 border-b pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <CardTitle className="text-xl text-gray-800 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-teal-600" />
-                Booking Information
-              </CardTitle>
-              <div className="flex items-center gap-3">
-                <StatusBadge status={booking.status} />
-                <StatusBadge status={booking.payment_status} type="payment" />
-              </div>
-            </div>
-          </CardHeader>
+         <BookingCardHeader booking={booking}/>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">

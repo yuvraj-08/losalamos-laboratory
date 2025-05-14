@@ -16,7 +16,6 @@ type StatusBadgeProps = {
 
 export function StatusBadge({ status, type = "booking" }: StatusBadgeProps) {
   if (!status) return null;
-
   const getVariant = () => {
     switch (status) {
       case "completed":
@@ -48,7 +47,7 @@ export function StatusBadge({ status, type = "booking" }: StatusBadgeProps) {
         variant === "info" && "border-blue-500 bg-blue-50 text-blue-700"
       )}
     >
-      {status}
+      {status.replace("-", " ")}
     </Badge>
   );
 }

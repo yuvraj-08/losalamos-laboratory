@@ -127,3 +127,22 @@ export async function updateDocLink(testId: string, data: any) {
     toast.error("Failed to update document link. Please try again.");
   }
 }
+
+export async function updateBookingStatus(id: string, status: string) {
+  try {
+    const { error, data } = await supabase
+      .from("bookings")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Error updating booking status: " + error.message);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error updating booking status:", error);
+    toast.error("Failed to update booking status. Please try again.");
+  }
+}
