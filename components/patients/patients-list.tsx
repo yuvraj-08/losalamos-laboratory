@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Pencil, Trash2, Search } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, Loader } from "lucide-react";
 // import { ViewPatientDetails } from "./view-patient-details";
 // import { CreatePatientForm } from "./create-patient-form";
 import { EditPatientForm } from "./edit-patient-form";
@@ -67,7 +67,7 @@ export function PatientsList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
-
+  const [loading, setLoading] = useState(true);
   // Modal states
   const [editingPatient, setEditingPatient] = useState<IExtendedUser | null>(
     null
@@ -83,6 +83,7 @@ export function PatientsList() {
   const fetchUsersData = async () => {
     const data = await fetchUsers();
     setPatients(data);
+    setLoading(false);
   };
   // Fetch categories from Supabase
   useEffect(() => {
@@ -136,6 +137,18 @@ export function PatientsList() {
   const handleEditSuccess = () => {
     fetchUsersData();
   };
+
+  if(loading){
+    return (
+      <>
+        <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center py-12">
+          <Loader className="animate-spin" />
+        </div>
+      </div>
+      </>
+    )
+  }
 
   return (
     <div className="space-y-4">

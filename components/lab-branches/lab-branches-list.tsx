@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Pencil, Trash2, Search } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, Loader } from "lucide-react";
 import { CreateLabBranchForm } from "./create-lab-branch-form";
 import { EditLabBranchForm } from "./edit-lab-branch-form";
 import { ViewLabBranchDetails } from "./view-lab-branch-details";
@@ -89,7 +89,7 @@ export function LabBranchesList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
-
+  const [loading, setLoading] = useState(true);
   // Modal states
   const [editingBranch, setEditingBranch] = useState<LabBranch | null>(null);
   const [viewingBranch, setViewingBranch] = useState<LabBranch | null>(null);
@@ -101,6 +101,7 @@ export function LabBranchesList() {
   const fetchBranches = async () => {
     const data = await fetchLabBranches();
     data && setBranches(data);
+    setLoading(false);
   };
   // Fetch categories from Supabase
   useEffect(() => {
@@ -158,6 +159,18 @@ export function LabBranchesList() {
 
     fetchBranches();
   };
+
+  if (loading) {
+    return (
+      <>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-center py-12">
+            <Loader className="animate-spin" />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="space-y-4">

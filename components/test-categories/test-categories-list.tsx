@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Pencil, Trash2, Search } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, Loader } from "lucide-react";
 import { CreateTestCategoryForm } from "./create-test-category-form";
 import { EditTestCategoryForm } from "./edit-test-category-form";
 import { ViewTestCategoryDetails } from "./view-test-category-details";
@@ -36,7 +36,7 @@ export function TestCategoriesList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
-
+  const [loading, setLoading] = useState(true);
   // Modal states
   const [editingCategory, setEditingCategory] = useState<TestCategory | null>(
     null
@@ -54,6 +54,7 @@ export function TestCategoriesList() {
   const fetchCategories = async () => {
     const data = await fetchTestCategories();
     setCategories(data);
+    setLoading(false);
   };
   // Fetch categories from Supabase
   useEffect(() => {
@@ -104,6 +105,18 @@ export function TestCategoriesList() {
   const handleEditSuccess = () => {
     fetchCategories();
   };
+
+  if (loading) {
+    return (
+      <>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-center py-12">
+            <Loader className="animate-spin" />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="space-y-4">

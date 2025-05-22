@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Pencil, Trash2, Search } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, Loader } from "lucide-react";
 import { CreateTestForm, TestFormValues } from "./create-test-form";
 import { EditTestForm } from "./edit-test-form";
 import { ViewTestDetails } from "./view-test-details";
@@ -73,7 +73,7 @@ export function TestList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
-
+  const [loading, setLoading] = useState(true);
   // Modal states
   const [editingTest, setEditingTest] = useState<TestWithCategory | null>(null);
   const [viewingTest, setViewingTest] = useState<TestWithCategory | null>(null);
@@ -87,6 +87,7 @@ export function TestList() {
   const fetchTestsData = async () => {
     const data = await fetchTests();
     setTests(data);
+    setLoading(false);
   };
 
   // Fetch categories from Supabase
@@ -140,6 +141,18 @@ export function TestList() {
     // In a real app, you would fetch the updated list
     fetchTestsData();
   };
+
+  if (loading) {
+    return (
+      <>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-center py-12">
+            <Loader className="animate-spin" />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="space-y-4">

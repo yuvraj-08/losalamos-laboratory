@@ -110,6 +110,7 @@ export function TestResultCard({
     });
 
     setIsSubmitting(false);
+    setIsEditing(false);
     onResultUpdate();
     toast.success("Test result has been updated successfully.");
   };
@@ -129,6 +130,7 @@ export function TestResultCard({
       });
 
       onResultUpdate();
+      setIsEditing(false);
       toast.success("Test report has been uploaded successfully.");
       setSelectedFile(null);
     } catch (err) {
