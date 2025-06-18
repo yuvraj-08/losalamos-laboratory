@@ -11,6 +11,8 @@ import {
   Dna,
   ArrowRight,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -984,6 +986,19 @@ const PartnersSection = ({ data }: PartnersSectionProps) => {
 
 // Main Component
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const toastShown = useRef(false);
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error && !toastShown.current) {
+      toastShown.current = true;
+      toast.error(decodeURIComponent(error));
+      router.replace("/", { scroll: false });
+    }
+  }, [searchParams, router]);
+
   // Initialize GSAP ScrollTrigger
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -1015,20 +1030,20 @@ export default function Home() {
 
     // Add floating animation to buttons
     gsap.utils.toArray<HTMLButtonElement>("button").forEach((button) => {
-  button.addEventListener("mouseenter", () => {
-    gsap.to(button, {
-      scale: 1.05,
-      duration: 0.3,
-    });
-  });
+      button.addEventListener("mouseenter", () => {
+        gsap.to(button, {
+          scale: 1.05,
+          duration: 0.3,
+        });
+      });
 
-  button.addEventListener("mouseleave", () => {
-    gsap.to(button, {
-      scale: 1,
-      duration: 0.3,
+      button.addEventListener("mouseleave", () => {
+        gsap.to(button, {
+          scale: 1,
+          duration: 0.3,
+        });
+      });
     });
-  });
-});
 
 
     return () => {

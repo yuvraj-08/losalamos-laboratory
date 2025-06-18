@@ -1,15 +1,44 @@
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { forgotPasswordAction } from "@/app/actions";
-import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
-// Server Component
-export default async function ForgotPassword(props: {
-  searchParams: Promise<Message>;
-}) {
-  const searchParams = await props.searchParams;
+type ForgotPasswordForm = {
+  email: string;
+};
+
+// Client Component
+export default function ForgotPassword() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, handleSubmit, reset } = useForm<ForgotPasswordForm>();
+
+  async function onSubmit(values: ForgotPasswordForm) {
+    setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append("email", values.email);
+    try {
+      // Call your action and get result (adjust return value as needed)
+      const result = await forgotPasswordAction(formData);
+      // Show toast based on result (customize as per your action's return)
+      if (result?.success) {
+        toast.success(result.message || "Password reset email sent!");
+        reset(); // Clear the input field
+      } else {
+        toast.error(result?.message || "Failed to send reset email.");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row w-full">
       {/* Left Column - Image/Branding */}
@@ -36,10 +65,11 @@ export default async function ForgotPassword(props: {
               </Link>
             </p>
           </div>
-          <form className="space-y-6" action={forgotPasswordAction}>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
+                {...register("email")}
                 name="email"
                 type="email"
                 placeholder="you@example.com"
@@ -50,10 +80,10 @@ export default async function ForgotPassword(props: {
             <SubmitButton
               className="w-full bg-teal-600 hover:bg-teal-700"
               pendingText="Sending..."
+              disabled={isSubmitting}
             >
               Reset Password
             </SubmitButton>
-            <FormMessage message={searchParams} />
           </form>
         </div>
       </div>

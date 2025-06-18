@@ -45,6 +45,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Unexpected error fetching app user:", err);
       setAppUser(null);
     }
+    finally{
+      setLoading(false);
+    }
   };
 
   const fetchSessionAndUser = async () => {

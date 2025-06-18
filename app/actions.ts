@@ -29,7 +29,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   const callbackUrl = formData.get("callbackUrl")?.toString();
 
   if (!email) {
-    return encodedRedirect("error", "/forgot-password", "Email is required");
+    return { success: false, message: "Email is required" };
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -38,22 +38,17 @@ export const forgotPasswordAction = async (formData: FormData) => {
 
   if (error) {
     console.error(error.message);
-    return encodedRedirect(
-      "error",
-      "/forgot-password",
-      "Could not reset password"
-    );
+    return { success: false, message: "Could not reset password" };
   }
 
   if (callbackUrl) {
     return redirect(callbackUrl);
   }
 
-  return encodedRedirect(
-    "success",
-    "/forgot-password",
-    "Check your email for a link to reset your password."
-  );
+  return {
+    success: true,
+    message: "Check your email for a link to reset your password.",
+  };
 };
 
 export const resetPasswordAction = async (formData: FormData) => {
@@ -63,15 +58,14 @@ export const resetPasswordAction = async (formData: FormData) => {
   const confirmPassword = formData.get("confirmPassword") as string;
 
   if (!password || !confirmPassword) {
-    encodedRedirect(
-      "error",
-      "/reset-password",
-      "Password and confirm password are required"
-    );
+    return {
+      success: false,
+      message: "Password and confirm password are required",
+    };
   }
 
   if (password !== confirmPassword) {
-    encodedRedirect("error", "/reset-password", "Passwords do not match");
+    return { success: false, message: "Passwords do not match" };
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -79,10 +73,10 @@ export const resetPasswordAction = async (formData: FormData) => {
   });
 
   if (error) {
-    encodedRedirect("error", "/reset-password", "Password update failed");
+    return { success: false, message: "Password update failed" };
   }
 
-  encodedRedirect("success", "/", "Password updated");
+  return { success: true, message: "Password updated" };
 };
 
 export const signOutAction = async () => {
