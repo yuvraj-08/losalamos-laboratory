@@ -212,7 +212,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
           alt="Laboratory interior"
           width={1200}
           height={500}
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full !transform-none"
         />
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-4 md:px-16">
           <div className="text-white max-w-3xl hero-content">
